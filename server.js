@@ -27,6 +27,8 @@ const STANDAR_NILAI_UPI = {
   'E': 0.0
 };
 
+const JWT_SECRET = process.env.JWT_SECRET || 'rahasia_siladik_ai_upi_tasikmalaya_2026';
+
 // Middleware Otorisasi: Khusus Admin dan Petugas (Staf TU / KASI)
 function authorizeAdminOrStaff(req, res, next) {
   // 1. Cek dari header Authorization (Bearer Token JWT)
