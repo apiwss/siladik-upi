@@ -46,7 +46,11 @@ const QueueSlaManager = (() => {
           // Urutkan: FIFO (created_at ASC sudah dari server, pastikan dipertahankan)
           merged.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
           localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-          window.dispatchEvent(new CustomEvent('queue:synced', { detail: merged }));
+          
+          // Hanya broadcast jika pengguna sedang login
+          if (typeof AuthManager !== 'undefined' && AuthManager.getCurrentUser()) {
+            window.dispatchEvent(new CustomEvent('queue:synced', { detail: merged }));
+          }
           return merged;
         }
       }
@@ -59,16 +63,26 @@ const QueueSlaManager = (() => {
   // Setup live sync auto-polling & visibility change (agar HP & laptop selalu sinkron real-time)
   if (typeof window !== 'undefined') {
     setInterval(() => {
+      // Jangan lakukan polling jika pengguna sudah logout (sedang di halaman Login)
+      if (typeof AuthManager !== 'undefined' && !AuthManager.getCurrentUser()) {
+        return;
+      }
       syncFromDatabase().catch(() => {});
     }, 3500);
 
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
+        if (typeof AuthManager !== 'undefined' && !AuthManager.getCurrentUser()) {
+          return;
+        }
         syncFromDatabase().catch(() => {});
       }
     });
 
     window.addEventListener('focus', () => {
+      if (typeof AuthManager !== 'undefined' && !AuthManager.getCurrentUser()) {
+        return;
+      }
       syncFromDatabase().catch(() => {});
     });
   }

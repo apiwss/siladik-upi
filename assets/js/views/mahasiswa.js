@@ -17,8 +17,7 @@ const MahasiswaView = (() => {
   async function render(container) {
     const user = AuthManager.getCurrentUser();
 
-    if (user.role !== 'mahasiswa') {
-      container.innerHTML = `<div class="card p-4"><p class="text-danger">Akses Ditolak: Halaman ini hanya untuk Mahasiswa.</p></div>`;
+    if (!user || user.role !== 'mahasiswa') {
       return;
     }
 
@@ -29,13 +28,25 @@ const MahasiswaView = (() => {
       console.warn('Sync antrean mahasiswa failed, fallback to local cache:', e);
     }
 
+    // Cek kembali status login setelah await sync (mencegah overwrite jika user baru saja klik Keluar)
+    let activeUser = AuthManager.getCurrentUser();
+    if (!activeUser || activeUser.role !== 'mahasiswa' || !container) {
+      return;
+    }
+
     // Ambil data profil mahasiswa langsung dari SIAKAD / PostgreSQL
     let student = null;
 
     try {
-      student = await SiakadApi.getStudentByNim(user.nim);
+      student = await SiakadApi.getStudentByNim(activeUser.nim);
     } catch (e) {
       console.warn('Gagal mengambil data mahasiswa dari API:', e);
+    }
+
+    // Cek kembali status login setelah await SiakadApi
+    activeUser = AuthManager.getCurrentUser();
+    if (!activeUser || activeUser.role !== 'mahasiswa' || !container) {
+      return;
     }
 
     // Pastikan data mahasiswa SELALU sesuai dengan identitas user yang sedang login

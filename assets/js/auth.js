@@ -427,6 +427,11 @@ const AuthManager = (() => {
 
     // Logout
     logout: () => {
+      try {
+        sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(LEGACY_SESSION_KEY);
+        sessionStorage.clear();
+      } catch (e) {}
       setCurrentUser(null);
     }
   };

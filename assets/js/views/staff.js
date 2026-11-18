@@ -16,8 +16,7 @@ const StaffView = (() => {
 
   async function render(container) {
     const user = AuthManager.getCurrentUser();
-    if (user.role !== 'staff') {
-      container.innerHTML = `<div class="card p-4"><p class="text-danger">Akses Ditolak: Halaman ini hanya untuk Staf Layanan Akademik.</p></div>`;
+    if (!user || user.role !== 'staff') {
       return;
     }
 
@@ -26,6 +25,12 @@ const StaffView = (() => {
       await QueueSlaManager.syncFromDatabase();
     } catch (e) {
       console.warn('Sync staff view failed, fallback to local cache:', e);
+    }
+
+    // Cek kembali status login setelah await (mencegah overwrite jika user baru saja klik Keluar)
+    const activeUser = AuthManager.getCurrentUser();
+    if (!activeUser || activeUser.role !== 'staff' || !container) {
+      return;
     }
 
     const allRequests = QueueSlaManager.getAllRequests();
