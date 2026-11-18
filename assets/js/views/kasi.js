@@ -13,6 +13,12 @@ const KasiView = (() => {
       return;
     }
 
+    try {
+      await QueueSlaManager.syncFromDatabase();
+    } catch (e) {
+      console.warn('Sync kasi view failed, fallback to local cache:', e);
+    }
+
     const analytics = QueueSlaManager.getKasiAnalytics();
     const allRequests = QueueSlaManager.getAllRequests();
 

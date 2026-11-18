@@ -15,6 +15,13 @@ const StaffView = (() => {
       return;
     }
 
+    // Pastikan data teranyar dari cloud PostgreSQL telah diambil (Multi-Device Sync)
+    try {
+      await QueueSlaManager.syncFromDatabase();
+    } catch (e) {
+      console.warn('Sync staff view failed, fallback to local cache:', e);
+    }
+
     const allRequests = QueueSlaManager.getAllRequests();
     const pendingQueue = allRequests.filter(r => r.status === 'antrean' || r.status === 'verifikasi_staf');
     const completedToday = allRequests.filter(r => r.status === 'selesai');

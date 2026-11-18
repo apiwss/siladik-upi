@@ -56,6 +56,23 @@ const QueueSlaManager = (() => {
     return null;
   }
 
+  // Setup live sync auto-polling & visibility change (agar HP & laptop selalu sinkron real-time)
+  if (typeof window !== 'undefined') {
+    setInterval(() => {
+      syncFromDatabase().catch(() => {});
+    }, 3500);
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        syncFromDatabase().catch(() => {});
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      syncFromDatabase().catch(() => {});
+    });
+  }
+
   // Baca dari localStorage tanpa trigger sync (internal use)
   function loadRequestsFromStorage() {
     try {
@@ -70,7 +87,7 @@ const QueueSlaManager = (() => {
   function loadRequests() {
     if (!_apiSyncStarted && typeof window !== 'undefined') {
       _apiSyncStarted = true;
-      setTimeout(() => syncFromDatabase(), 100);
+      syncFromDatabase().catch(() => {});
     }
     // PostgreSQL adalah sumber kebenaran — kembalikan cache lokal atau array kosong
     return loadRequestsFromStorage();

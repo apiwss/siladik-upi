@@ -16,8 +16,12 @@ const MahasiswaView = (() => {
       return;
     }
 
-    // Sinkronkan data terbaru di latar belakang (non-blocking) agar render langsung instan tanpa jeda
-    QueueSlaManager.syncFromDatabase().catch(() => {});
+    // Sinkronkan data terbaru dari cloud PostgreSQL sebelum merender riwayat
+    try {
+      await QueueSlaManager.syncFromDatabase();
+    } catch (e) {
+      console.warn('Sync antrean mahasiswa failed, fallback to local cache:', e);
+    }
 
     // Ambil data profil mahasiswa langsung dari SIAKAD / PostgreSQL
     let student = null;

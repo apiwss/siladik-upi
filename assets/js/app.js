@@ -13,6 +13,25 @@ const App = (() => {
       renderCurrentState();
     });
 
+    // Real-time synchronization across devices (Laptop, HP, Tablet)
+    window.addEventListener('queue:synced', () => {
+      const user = AuthManager.getCurrentUser();
+      const modal = document.getElementById('globalModalOverlay');
+      // Jangan refresh tampilan jika sedang ada modal verifikasi/preview yang terbuka
+      if (modal && modal.classList.contains('active')) return;
+
+      const container = document.getElementById('viewContainer');
+      if (!user || !container) return;
+
+      if (user.role === 'staff' && typeof StaffView !== 'undefined' && StaffView.render) {
+        StaffView.render(container);
+      } else if (user.role === 'mahasiswa' && typeof MahasiswaView !== 'undefined' && MahasiswaView.render) {
+        MahasiswaView.render(container);
+      } else if (user.role === 'kasi' && typeof KasiView !== 'undefined' && KasiView.render) {
+        KasiView.render(container);
+      }
+    });
+
     // Setup global modal close listeners
     const overlay = document.getElementById('globalModalOverlay');
     if (overlay) {
