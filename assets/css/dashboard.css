@@ -2305,11 +2305,30 @@
 
   /* 9. Form Inputs - Anti-iOS Zoom & Full Touch Target */
   .form-control,
-  .form-select,
-  .siladik-form-input {
+  .form-select {
     font-size: 16px !important; /* Mencegah iOS Safari auto-zoom yang mengganggu */
     padding: 0.65rem 0.85rem !important;
     border-radius: 10px !important;
+  }
+
+  .siladik-form-input {
+    font-size: 16px !important; /* Mencegah iOS Safari auto-zoom yang mengganggu */
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    border-radius: 10px !important;
+  }
+
+  /* Jika input memiliki ikon di sebelah kiri, beri ruang padding 2.75rem agar teks tidak menabrak ikon */
+  .siladik-input-box .siladik-input-icon ~ .siladik-form-input,
+  .siladik-input-box:has(.siladik-input-icon) .siladik-form-input {
+    padding-left: 2.75rem !important;
+  }
+
+  /* Jika input password dengan tombol intip sandi di kanan */
+  .siladik-input-box input[type="password"] {
+    padding-right: 2.85rem !important;
   }
 
   .form-label,
