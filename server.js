@@ -1854,12 +1854,17 @@ async function ensureDatabaseReady() {
   }
 }
 
-// Start Server
-app.listen(PORT, async () => {
-  console.log('==========================================================');
-  console.log(` SILADIK-AI NODE.JS & POSTGRESQL SERVER AKTIF`);
-  console.log(` Alamat Server : http://localhost:${PORT}`);
-  console.log(` Test Database : http://localhost:${PORT}/api/health`);
-  console.log('==========================================================');
-  await ensureDatabaseReady();
-});
+// Start Server (Hanya dijalankan jika standalone / bukan serverless Vercel)
+if (require.main === module || !process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    console.log('==========================================================');
+    console.log(` SILADIK-AI NODE.JS & POSTGRESQL SERVER AKTIF`);
+    console.log(` Alamat Server : http://localhost:${PORT}`);
+    console.log(` Test Database : http://localhost:${PORT}/api/health`);
+    console.log('==========================================================');
+    await ensureDatabaseReady();
+  });
+}
+
+// Export app untuk Vercel Serverless Function
+module.exports = app;
