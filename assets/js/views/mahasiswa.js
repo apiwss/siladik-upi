@@ -7,6 +7,12 @@
 
 const MahasiswaView = (() => {
   let timerInterval = null;
+  let mobileViewMode = 'card'; // 'card' (default mobile) atau 'table' (bisa di-slide)
+
+  function toggleMobileViewMode() {
+    mobileViewMode = mobileViewMode === 'card' ? 'table' : 'card';
+    render(document.getElementById('viewContainer'));
+  }
 
   async function render(container) {
     const user = AuthManager.getCurrentUser();
@@ -285,20 +291,86 @@ const MahasiswaView = (() => {
           <!-- Riwayat Pengajuan Mahasiswa (FR-08) -->
           <div class="card">
             <div class="card-header">
-
-              <h4 class="card-title">
-                Riwayat Pengajuan Dokumen Anda
-              </h4>
-
-              <span class="badge" style="background:#f1f5f9; color:#475569;">
-                ${requests.length} Pengajuan
-              </span>
+              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 0.5rem;">
+                <h4 class="card-title">
+                  Riwayat Pengajuan Dokumen Anda
+                </h4>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge" style="background:#f1f5f9; color:#475569;">
+                    ${requests.length} Pengajuan
+                  </span>
+                  <!-- Switcher Mode Tampilan di HP -->
+                  <div class="mobile-only-toggle-wrapper">
+                    <button type="button" class="mobile-toggle-btn" onclick="MahasiswaView.toggleMobileViewMode()" title="Ganti mode tampilan">
+                      ${mobileViewMode === 'card' ? '📊 Mode Tabel (Slide)' : '📱 Mode Kartu'}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="card-body" style="padding: 0;">
-              <div class="data-table-wrapper" style="border:none;">
+              ${mobileViewMode === 'card' ? `
+                <!-- 1. Tampilan Kartu Mobile (Sangat Rapi & Pas di Layar HP) -->
+                <div class="mobile-student-cards-wrapper">
+                  ${requests.length === 0 ? `
+                    <div style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem; font-size: 0.85rem;">
+                      Belum ada riwayat pengajuan dokumen.
+                    </div>
+                  ` : requests.map(r => `
+                    <div class="mobile-student-card">
+                      <div class="msc-header">
+                        <div style="display: flex; align-items: center; gap: 0.45rem;">
+                          <span class="badge-queue-no">${r.queueNo}</span>
+                          <span class="msc-date">${new Date(r.createdAt).toLocaleDateString('id-ID')}</span>
+                        </div>
+                        <div>
+                          ${getStatusBadge(r.status)}
+                        </div>
+                      </div>
 
-                <table class="data-table">
+                      <div class="msc-body">
+                        <div class="msc-doc-title">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                          <span>${r.docTitle}</span>
+                          ${r.semester ? `<span class="badge badge-diajukan" style="margin-left: 0.35rem;">Sem. ${r.semester}</span>` : ''}
+                        </div>
+                        <div class="msc-keperluan">
+                          ${r.keperluan || 'Keperluan pengajuan dokumen akademik'}
+                        </div>
+                      </div>
+
+                      <div class="msc-footer">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-secondary msc-timeline-btn"
+                          onclick="MahasiswaView.showTimelineModal('${r.id || r.queueNo}')"
+                          title="Lacak 4 tahapan dokumen">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                          <span>Lacak Status</span>
+                        </button>
+
+                        ${r.status === 'selesai' ? `
+                          <button
+                            class="btn btn-sm btn-success msc-download-btn"
+                            onclick="MahasiswaView.downloadOfficialDocDirect('${r.id}')"
+                            title="Unduh Dokumen PDF">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Unduh PDF</span>
+                          </button>
+                        ` : `
+                          <span class="msc-processing-badge">
+                            ⏳ Dalam Proses
+                          </span>
+                        `}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+
+                <!-- 2. Tampilan Tabel Desktop (Otomatis Aktif di Layar Lebar) -->
+                <div class="desktop-data-table-wrapper data-table-wrapper" style="border:none;">
+                  <table class="data-table">
                   <thead>
                     <tr>
                       <th style="width: 140px; min-width: 130px; white-space: nowrap;">No Antrean</th>
@@ -372,9 +444,84 @@ const MahasiswaView = (() => {
                       </tr>
                     `).join('')}
                   </tbody>
-                </table>
-
-              </div>
+                  </table>
+                </div>
+              ` : `
+                <!-- 3. Mode Tabel Mobile (Disertai Petunjuk Slide & Scrollbar Halus) -->
+                <div class="table-scroll-indicator">
+                  <span class="tsi-arrow">👉</span>
+                  <span>Geser tabel ke samping untuk melihat aksi ➔</span>
+                </div>
+                <div class="data-table-wrapper" style="border:none;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 140px; min-width: 130px; white-space: nowrap;">No Antrean</th>
+                        <th>Dokumen</th>
+                        <th style="white-space: nowrap;">Waktu Diajukan</th>
+                        <th style="white-space: nowrap;">Status</th>
+                        <th style="white-space: nowrap; text-align: center;">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${requests.length === 0 ? `
+                        <tr>
+                          <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                            Belum ada riwayat pengajuan dokumen.
+                          </td>
+                        </tr>
+                      ` : requests.map(r => `
+                        <tr>
+                          <td style="white-space: nowrap;">
+                            <span class="badge-queue-no">
+                              ${r.queueNo}
+                            </span>
+                          </td>
+                          <td>
+                            <strong>${r.docTitle}</strong>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">
+                              ${r.keperluan || '-'}
+                              ${r.semester ? ` • Semester ${r.semester}` : ''}
+                            </div>
+                          </td>
+                          <td style="white-space: nowrap;">
+                            ${new Date(r.createdAt).toLocaleDateString('id-ID')}
+                          </td>
+                          <td style="white-space: nowrap;">
+                            <button
+                              type="button"
+                              class="status-timeline-btn"
+                              onclick="MahasiswaView.showTimelineModal('${r.id || r.queueNo}')"
+                              title="Klik untuk melacak 4 tahapan progres pengajuan">
+                              ${getStatusBadge(r.status)}
+                              <span class="timeline-click-hint">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                                Lacak
+                              </span>
+                            </button>
+                          </td>
+                          <td style="white-space: nowrap; text-align: center;">
+                            ${r.status === 'selesai' ? `
+                              <button
+                                class="btn btn-sm btn-success"
+                                style="display: inline-flex; align-items: center; gap: 0.35rem;"
+                                onclick="MahasiswaView.downloadOfficialDocDirect('${r.id}')"
+                                title="Unduh Berkas Dokumen PDF Resmi">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span>Unduh PDF</span>
+                              </button>
+                            ` : `
+                              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">
+                                Dalam Proses
+                              </span>
+                            `}
+                          </td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              `}
             </div>
           </div>
         </div>
@@ -955,6 +1102,7 @@ const MahasiswaView = (() => {
 
   return {
     render,
+    toggleMobileViewMode,
     handleDocTypeChange,
     handleKeperluanChange,
     handleSubmit,

@@ -379,6 +379,10 @@ const KasiView = (() => {
           <span style="font-size: 0.8rem; color: var(--text-muted);">Periode: Semester Genap 2025/2026</span>
         </div>
         <div class="card-body" style="padding: 0;">
+          <div class="table-scroll-indicator">
+            <span class="tsi-arrow">👉</span>
+            <span>Geser tabel ke samping untuk melihat detail beban staf ➔</span>
+          </div>
           <div class="data-table-wrapper" style="border: none;">
             <table class="data-table">
               <thead>

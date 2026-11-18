@@ -1781,6 +1781,18 @@
   align-items: start;
 }
 
+/* Base definitions for Dual-Mode Mobile Components on Desktop */
+.mobile-only-toggle-wrapper,
+.mobile-queue-cards-wrapper,
+.mobile-student-cards-wrapper,
+.table-scroll-indicator {
+  display: none !important;
+}
+
+.desktop-data-table-wrapper {
+  display: block !important;
+}
+
 /* ===================================================================
    COMPREHENSIVE MOBILE-FIRST RESPONSIVE ENGINE (ALL SMARTPHONES)
    iPhone (SE/12/13/14/15/16/Pro/Max), Samsung Galaxy, Xiaomi, Oppo, Vivo, Realme
@@ -1792,7 +1804,6 @@
     padding: 0.85rem 0.65rem 2rem 0.65rem !important;
     max-width: 100% !important;
     width: 100% !important;
-    overflow-x: hidden;
   }
 
   /* 2. Top Navbar - Clean, Compact & Touch-Friendly */
@@ -2022,18 +2033,41 @@
     border-radius: 20px !important;
   }
 
-  /* 7. Data Tables on Mobile (Smooth Horizontal Swipe + Min-Width) */
+  /* 7. Data Tables on Mobile (Smooth Horizontal Swipe + Min-Width + Touch Action) */
   .data-table-wrapper {
     width: 100% !important;
+    max-width: 100% !important;
     overflow-x: auto !important;
+    overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x pan-y !important;
+    overscroll-behavior-x: contain !important;
     border: none !important;
     border-radius: 0 0 14px 14px !important;
+    position: relative !important;
+    display: block !important;
+  }
+
+  /* Visible mobile horizontal scrollbar */
+  .data-table-wrapper::-webkit-scrollbar {
+    height: 7px !important;
+    display: block !important;
+  }
+
+  .data-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f5f9 !important;
+    border-radius: 4px !important;
+  }
+
+  .data-table-wrapper::-webkit-scrollbar-thumb {
+    background: #94a3b8 !important;
+    border-radius: 4px !important;
   }
 
   .data-table {
-    min-width: 620px !important; /* Preserves column geometry so text never squishes */
-    width: 100% !important;
+    min-width: 680px !important; /* Preserves column geometry so text never squishes */
+    width: max-content !important;
+    display: table !important;
   }
 
   .data-table th {
@@ -2049,6 +2083,218 @@
   .badge-queue-no {
     font-size: 0.72rem !important;
     padding: 0.2rem 0.5rem !important;
+  }
+
+  /* Mobile Horizontal Scroll Indicator Banner */
+  .table-scroll-indicator {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.45rem !important;
+    padding: 0.5rem 0.75rem !important;
+    background: #f0fdfa !important;
+    border-bottom: 1px solid #ccfbf1 !important;
+    color: #0f766e !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  .table-scroll-indicator .tsi-arrow {
+    display: inline-block;
+    animation: slideIndicator 1.4s infinite ease-in-out;
+  }
+
+  @keyframes slideIndicator {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(6px); }
+  }
+
+  /* View Switcher Toggle on Mobile (Cards vs Table) */
+  .mobile-only-toggle-wrapper {
+    display: flex !important;
+    margin-left: auto;
+  }
+
+  .mobile-toggle-btn {
+    font-size: 0.72rem !important;
+    padding: 0.35rem 0.65rem !important;
+    border-radius: 8px !important;
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #334155 !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  /* Sembunyikan tabel desktop saat berada di mobile jika mode kartu aktif */
+  .desktop-data-table-wrapper {
+    display: none !important;
+  }
+
+  /* Native Mobile Cards Container */
+  .mobile-queue-cards-wrapper,
+  .mobile-student-cards-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem !important;
+    background: #f8fafc !important;
+  }
+
+  .mobile-queue-card,
+  .mobile-student-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    padding: 1rem 0.95rem !important;
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.06) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  }
+
+  .mobile-queue-card:active,
+  .mobile-student-card:active {
+    transform: scale(0.99) !important;
+  }
+
+  .mqc-header,
+  .msc-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    padding-bottom: 0.55rem !important;
+    border-bottom: 1px dashed #e2e8f0 !important;
+  }
+
+  .mqc-header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .mqc-time,
+  .msc-date {
+    font-size: 0.72rem !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+  }
+
+  .mqc-student {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+  }
+
+  .mqc-avatar {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #0d9488 0%, #047857 100%) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  .mqc-student-meta {
+    display: flex !important;
+    flex-direction: column !important;
+    line-height: 1.25 !important;
+  }
+
+  .mqc-student-name {
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+  }
+
+  .mqc-student-sub {
+    font-size: 0.72rem !important;
+    color: #64748b !important;
+  }
+
+  .mqc-doc-box,
+  .msc-body {
+    background: #f8fafc !important;
+    border: 1px solid #f1f5f9 !important;
+    border-radius: 10px !important;
+    padding: 0.65rem 0.75rem !important;
+  }
+
+  .mqc-doc-title,
+  .msc-doc-title {
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    flex-wrap: wrap !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .mqc-doc-keperluan,
+  .msc-keperluan {
+    font-size: 0.75rem !important;
+    color: #64748b !important;
+    line-height: 1.35 !important;
+  }
+
+  .mqc-footer {
+    width: 100% !important;
+  }
+
+  .mqc-btn {
+    width: 100% !important;
+    padding: 0.65rem 1rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25) !important;
+  }
+
+  .msc-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    margin-top: 0.25rem !important;
+  }
+
+  .msc-timeline-btn {
+    padding: 0.35rem 0.65rem !important;
+    border-radius: 8px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .msc-download-btn {
+    padding: 0.45rem 0.85rem !important;
+    border-radius: 8px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+  }
+
+  .msc-processing-badge {
+    font-size: 0.72rem !important;
+    color: #d97706 !important;
+    background: #fef3c7 !important;
+    padding: 0.3rem 0.65rem !important;
+    border-radius: 20px !important;
+    font-weight: 600 !important;
   }
 
   /* 8. Dashboard Layout Grid (Forms + Tables stack cleanly) */

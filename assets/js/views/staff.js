@@ -7,6 +7,12 @@
 
 const StaffView = (() => {
   let activeFilter = 'all';
+  let mobileViewMode = 'card'; // 'card' (default mobile) atau 'table' (bisa di-slide)
+
+  function toggleMobileViewMode() {
+    mobileViewMode = mobileViewMode === 'card' ? 'table' : 'card';
+    render(document.getElementById('viewContainer'));
+  }
 
   async function render(container) {
     const user = AuthManager.getCurrentUser();
@@ -108,78 +114,197 @@ const StaffView = (() => {
       <!-- Main Staff Queue Table -->
       <div class="card">
         <div class="card-header">
-          <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 0.5rem;">
             <h3 class="card-title">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
               Daftar Antrean Kerja Staf Layanan Akademik (FIFO Queue)
             </h3>
+
+            <!-- Switcher Mode Tampilan di HP -->
+            <div class="mobile-only-toggle-wrapper">
+              <button type="button" class="mobile-toggle-btn" onclick="StaffView.toggleMobileViewMode()" title="Ganti mode tampilan">
+                ${mobileViewMode === 'card' ? '📊 Mode Tabel (Slide)' : '📱 Mode Kartu'}
+              </button>
+            </div>
           </div>
 
           <!-- Queue Filter Tabs -->
-          <div class="queue-filter-tabs" style="display: flex; gap: 0.4rem;">
+          <div class="queue-filter-tabs" style="display: flex; gap: 0.4rem; overflow-x: auto; width: 100%;">
             <button class="btn btn-sm ${activeFilter === 'all' ? 'btn-teal' : 'btn-secondary'}" onclick="StaffView.setFilter('all')">Semua (${allRequests.length})</button>
             <button class="btn btn-sm ${activeFilter === 'pending' ? 'btn-teal' : 'btn-secondary'}" onclick="StaffView.setFilter('pending')">Antrean FIFO (${allRequests.filter(r => r.status === 'antrean').length})</button>
-            <button class="btn btn-sm ${activeFilter === 'review' ? 'btn-teal' : 'btn-secondary'}" onclick="StaffView.setFilter('review')">Review Draf Dokumen (${allRequests.filter(r => r.status === 'verifikasi_staf').length})</button>
+            <button class="btn btn-sm ${activeFilter === 'review' ? 'btn-teal' : 'btn-secondary'}" onclick="StaffView.setFilter('review')">Review Draf (${allRequests.filter(r => r.status === 'verifikasi_staf').length})</button>
             <button class="btn btn-sm ${activeFilter === 'completed' ? 'btn-teal' : 'btn-secondary'}" onclick="StaffView.setFilter('completed')">Selesai (${completedToday.length})</button>
           </div>
         </div>
 
         <div class="card-body" style="padding: 0;">
-          <div class="data-table-wrapper" style="border: none;">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th style="width: 140px; min-width: 130px; white-space: nowrap;">No Antrean</th>
-                  <th width="24%">Identitas Mahasiswa</th>
-                  <th width="20%">Jenis Dokumen</th>
-                  <th width="14%">Semester</th>
-                  <th width="15%">SLA (3 Hari Kerja)</th>
-                  <th width="15%">Aksi Eksekutor</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${filteredList.length === 0 ? `
-                  <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">Tidak ada antrean dalam kategori ini.</td></tr>
-                ` : filteredList.map(r => {
-      const sla = QueueSlaManager.getSlaCountdown(r.slaDeadline, r.status);
-      return `
-                    <tr>
-                      <td style="white-space: nowrap;">
+          ${mobileViewMode === 'card' ? `
+            <!-- 1. Tampilan Kartu Mobile (Sangat Nyaman & Pas di Semua HP) -->
+            <div class="mobile-queue-cards-wrapper">
+              ${filteredList.length === 0 ? `
+                <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 0.85rem;">
+                  Tidak ada antrean dalam kategori ini.
+                </div>
+              ` : filteredList.map(r => {
+                const sla = QueueSlaManager.getSlaCountdown(r.slaDeadline, r.status);
+                return `
+                  <div class="mobile-queue-card">
+                    <div class="mqc-header">
+                      <div class="mqc-header-left">
                         <span class="badge-queue-no">${r.queueNo}</span>
-                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">
-                          ${new Date(r.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
+                        <span class="mqc-time">${new Date(r.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
+                      </div>
+                      <span class="sla-timer ${sla.state}">⏱ ${sla.text}</span>
+                    </div>
+
+                    <div class="mqc-body">
+                      <div class="mqc-student">
+                        <div class="mqc-avatar">${r.nama ? r.nama.charAt(0) : 'M'}</div>
+                        <div class="mqc-student-meta">
+                          <strong class="mqc-student-name">${r.nama}</strong>
+                          <div class="mqc-student-sub">NIM: ${r.nim} • ${r.prodi}</div>
                         </div>
-                      </td>
-                      <td>
-                        <strong>${r.nama}</strong>
-                        <div style="font-size: 0.78rem; color: var(--text-muted);">NIM: ${r.nim} • ${r.prodi}</div>
-                      </td>
-                      <td>
-                        <strong>${r.docTitle}</strong>
-                        <div style="font-size: 0.75rem; color: var(--text-muted);">${r.keperluan || '-'}</div>
-                      </td>
-                      <td>
-                        <span class="badge badge-diajukan">
-                          ${r.semester ? `Semester ${r.semester}` : 'Reguler'}
-                        </span>
-                      </td>
-                      <td>
-                        <span class="sla-timer ${sla.state}">
-                          ⏱ ${sla.text}
-                        </span>
-                      </td>
-                      <td>
-                        <button class="btn btn-sm btn-teal" onclick="StaffView.openProcessModal('${r.id}')">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                          ${r.status === 'selesai' ? 'Lihat Dokumen' : 'Proses Dokumen'}
-                        </button>
-                      </td>
-                    </tr>
-                  `;
-    }).join('')}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+
+                      <div class="mqc-doc-box">
+                        <div class="mqc-doc-title">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                          <span>${r.docTitle}</span>
+                          <span class="badge badge-diajukan">${r.semester ? `Semester ${r.semester}` : 'Reguler'}</span>
+                        </div>
+                        <div class="mqc-doc-keperluan">${r.keperluan || 'Keperluan Akademik Mahasiswa'}</div>
+                      </div>
+                    </div>
+
+                    <div class="mqc-footer">
+                      <button class="btn btn-teal btn-block mqc-btn" onclick="StaffView.openProcessModal('${r.id}')">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        <span>${r.status === 'selesai' ? 'Lihat Dokumen Resmi' : 'Proses & Verifikasi Dokumen'}</span>
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- 2. Tampilan Tabel Desktop (Otomatis Aktif di Laptop & Layar Besar) -->
+            <div class="desktop-data-table-wrapper data-table-wrapper" style="border: none;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 140px; min-width: 130px; white-space: nowrap;">No Antrean</th>
+                    <th width="24%">Identitas Mahasiswa</th>
+                    <th width="20%">Jenis Dokumen</th>
+                    <th width="14%">Semester</th>
+                    <th width="15%">SLA (3 Hari Kerja)</th>
+                    <th width="15%">Aksi Eksekutor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${filteredList.length === 0 ? `
+                    <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">Tidak ada antrean dalam kategori ini.</td></tr>
+                  ` : filteredList.map(r => {
+                    const sla = QueueSlaManager.getSlaCountdown(r.slaDeadline, r.status);
+                    return `
+                      <tr>
+                        <td style="white-space: nowrap;">
+                          <span class="badge-queue-no">${r.queueNo}</span>
+                          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">
+                            ${new Date(r.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
+                          </div>
+                        </td>
+                        <td>
+                          <strong>${r.nama}</strong>
+                          <div style="font-size: 0.78rem; color: var(--text-muted);">NIM: ${r.nim} • ${r.prodi}</div>
+                        </td>
+                        <td>
+                          <strong>${r.docTitle}</strong>
+                          <div style="font-size: 0.75rem; color: var(--text-muted);">${r.keperluan || '-'}</div>
+                        </td>
+                        <td>
+                          <span class="badge badge-diajukan">
+                            ${r.semester ? `Semester ${r.semester}` : 'Reguler'}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="sla-timer ${sla.state}">
+                            ⏱ ${sla.text}
+                          </span>
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-teal" onclick="StaffView.openProcessModal('${r.id}')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            ${r.status === 'selesai' ? 'Lihat Dokumen' : 'Proses Dokumen'}
+                          </button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : `
+            <!-- 3. Mode Tabel Khusus Mobile (Disertai Petunjuk Slide & Scrollbar Halus) -->
+            <div class="table-scroll-indicator">
+              <span class="tsi-arrow">👉</span>
+              <span>Geser tabel ke samping untuk melihat aksi ➔</span>
+            </div>
+            <div class="data-table-wrapper" style="border: none;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 140px; min-width: 130px; white-space: nowrap;">No Antrean</th>
+                    <th width="24%">Identitas Mahasiswa</th>
+                    <th width="20%">Jenis Dokumen</th>
+                    <th width="14%">Semester</th>
+                    <th width="15%">SLA (3 Hari Kerja)</th>
+                    <th width="15%">Aksi Eksekutor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${filteredList.length === 0 ? `
+                    <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">Tidak ada antrean dalam kategori ini.</td></tr>
+                  ` : filteredList.map(r => {
+                    const sla = QueueSlaManager.getSlaCountdown(r.slaDeadline, r.status);
+                    return `
+                      <tr>
+                        <td style="white-space: nowrap;">
+                          <span class="badge-queue-no">${r.queueNo}</span>
+                          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 3px;">
+                            ${new Date(r.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
+                          </div>
+                        </td>
+                        <td>
+                          <strong>${r.nama}</strong>
+                          <div style="font-size: 0.78rem; color: var(--text-muted);">NIM: ${r.nim} • ${r.prodi}</div>
+                        </td>
+                        <td>
+                          <strong>${r.docTitle}</strong>
+                          <div style="font-size: 0.75rem; color: var(--text-muted);">${r.keperluan || '-'}</div>
+                        </td>
+                        <td>
+                          <span class="badge badge-diajukan">
+                            ${r.semester ? `Semester ${r.semester}` : 'Reguler'}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="sla-timer ${sla.state}">
+                            ⏱ ${sla.text}
+                          </span>
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-teal" onclick="StaffView.openProcessModal('${r.id}')">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            ${r.status === 'selesai' ? 'Lihat Dokumen' : 'Proses Dokumen'}
+                          </button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          `}
         </div>
       </div>
     `;
@@ -524,6 +649,7 @@ const StaffView = (() => {
   return {
     render,
     setFilter,
+    toggleMobileViewMode,
     openProcessModal,
     generateAiDraftInModal,
     executeApproval,
