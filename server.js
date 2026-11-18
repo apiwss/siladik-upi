@@ -1855,7 +1855,7 @@ async function ensureDatabaseReady() {
 }
 
 // Start Server (Hanya dijalankan jika standalone / bukan serverless Vercel)
-if (require.main === module || !process.env.VERCEL) {
+if (require.main === module && !process.env.VERCEL) {
   app.listen(PORT, async () => {
     console.log('==========================================================');
     console.log(` SILADIK-AI NODE.JS & POSTGRESQL SERVER AKTIF`);
