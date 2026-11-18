@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SILADIK | Sistem Layanan Akademik Terpadu • S1 Bisnis Digital</title>
+  <meta name="description"
+    content="SILADIK - Sistem Layanan Akademik Terpadu • S1 Bisnis Digital Universitas Pendidikan Indonesia Kampus Daerah Tasikmalaya.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/logo-upi-bulat.png">
+
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <link rel="stylesheet" href="assets/css/document-preview.css">
+</head>
+
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-navbar">
+    <div class="navbar-container">
+      <!-- Brand & University Logo -->
+      <div class="brand-wrapper">
+        <img src="assets/images/logo-upi-bulat.png" alt="Logo UPI" class="brand-logo" />
+        <div class="brand-text-group">
+          <div class="brand-title">
+            SILADIK
+            <span class="brand-badge">UPI Kampus Daerah Tasikmalaya</span>
+          </div>
+          <div class="brand-subtitle">
+            Sistem Layanan Akademik Terpadu • S1 Bisnis Digital
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Controls: Dynamically managed by App based on Login State -->
+      <div class="navbar-actions" id="headerProfileArea">
+        <div class="sso-badge">
+          <span class="dot"></span>
+          <span>Portal Akademik Terpadu</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="main-wrapper">
+
+    <!-- Dynamic Viewport (Login Page OR Mahasiswa/Staff/KASI View) -->
+    <div id="viewContainer" class="fade-in">
+      <!-- Injected dynamically: LoginView, MahasiswaView, StaffView, or KasiView -->
+    </div>
+  </main>
+
+  <!-- Global Modal for Document Review & PDF Preview -->
+  <div class="modal-overlay" id="globalModalOverlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="globalModalTitle">Pratinjau Dokumen</div>
+        <button class="modal-close-btn" onclick="App.closeModal()" title="Tutup Modal">&times;</button>
+      </div>
+      <div class="modal-content-scroll" id="globalModalBody">
+        <!-- Injected dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+
+      <div class="footer-brand">
+        <div>
+          <strong>SILADIK</strong>
+          <span class="footer-separator">•</span>
+          Universitas Pendidikan Indonesia Kampus Daerah Tasikmalaya
+        </div>
+
+        <div class="footer-team">
+          Tim Pengembang: Nabil Amanulloh, Nazwa Difa Nailla,
+          Nazwa Salsabila, Zahra Agniasari
+        </div>
+      </div>
+
+      <div class="footer-lecturers">
+        <div class="footer-lecturers-title">
+          Program Studi S1 Bisnis Digital
+        </div>
+        <div class="footer-lecturers-subtitle">
+          Dosen Pengampu
+        </div>
+
+        <ol class="lecturer-list">
+          <li>Dr. Syti Sarah Maesaroh, S.P., M.M.</li>
+          <li>Muhammad Rizki Nugraha, S.Pd., M.T.</li>
+          <li>Nugraha Adhi Pratama, S.T., M.Kom.</li>
+        </ol>
+
+        <div class="footer-year">Tahun Akademik 2026</div>
+      </div>
+
+    </div>
+  </footer>
+
+
+  <!-- Scripts -->
+  <script src="assets/js/xlsx.full.min.js"></script>
+  <script src="assets/js/html2pdf.bundle.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/siakad-api.js"></script>
+  <script src="assets/js/ai-document-engine.js"></script>
+  <script src="assets/js/queue-sla.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/views/login.js"></script>
+  <script src="assets/js/views/mahasiswa.js"></script>
+  <script src="assets/js/views/staff.js"></script>
+  <script src="assets/js/views/kasi.js"></script>
+  <script src="assets/js/views/admin.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+
+</html>

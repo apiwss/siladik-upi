@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="upiRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#991b1b"/>
+    </linearGradient>
+    <linearGradient id="upiGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Circle Outline -->
+  <circle cx="100" cy="100" r="94" fill="#ffffff" stroke="#dc2626" stroke-width="4"/>
+  
+  <!-- Outer Red Upper Wing Arc -->
+  <path d="M 28 88 C 36 42 66 22 100 22 C 134 22 164 42 172 88 C 145 68 118 72 100 86 C 82 72 55 68 28 88 Z" fill="url(#upiRed)"/>
+  
+  <!-- Yellow Torch Center -->
+  <ellipse cx="100" cy="55" rx="8" ry="12" fill="url(#upiGold)"/>
+  <path d="M 94 65 L 106 65 L 103 85 L 97 85 Z" fill="url(#upiGold)"/>
+
+  <!-- Stylized Person / Flame White Cutout -->
+  <circle cx="100" cy="56" r="6" fill="#ffffff"/>
+  <path d="M 94 72 Q 100 68 106 72 L 104 88 L 96 88 Z" fill="#ffffff"/>
+
+  <!-- Lower Black/Dark Striped Book Layers -->
+  <g fill="#1e293b">
+    <!-- Top Arc Layer -->
+    <path d="M 40 98 C 65 88 88 88 100 96 C 112 88 135 88 160 98 C 140 108 120 110 100 106 C 80 110 60 108 40 98 Z"/>
+    
+    <!-- Middle Arc Layer 1 -->
+    <path d="M 45 112 C 68 104 88 104 100 112 C 112 104 132 104 155 112 C 138 122 120 123 100 120 C 80 123 62 122 45 112 Z"/>
+    
+    <!-- Middle Arc Layer 2 -->
+    <path d="M 52 126 C 72 120 88 120 100 127 C 112 120 128 120 148 126 C 134 135 118 136 100 134 C 82 136 66 135 52 126 Z"/>
+    
+    <!-- Bottom Base Layer -->
+    <path d="M 60 140 C 76 135 90 135 100 141 C 110 135 124 135 140 140 C 128 152 114 155 100 154 C 86 155 72 152 60 140 Z"/>
+    
+    <!-- Central Divider -->
+    <rect x="98.5" y="94" width="3" height="60" fill="#ffffff"/>
+  </g>
+
+  <!-- Bottom Arch Support -->
+  <path d="M 68 158 Q 100 166 132 158 Q 100 162 68 158" fill="#dc2626"/>
+</svg>

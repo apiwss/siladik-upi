@@ -1,0 +1,406 @@
+/* ===================================================================
+   SISTEM INFORMASI LAYANAN AKADEMIK DIGITAL TERPADU (SILADIK-AI)
+   File: assets/css/document-preview.css - Official UPI PDF & Document Layout
+   =================================================================== */
+
+/* Multi-Page Wrapper */
+.doc-pages-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  align-items: center;
+  width: 100%;
+}
+
+/* Paper Container (Standar Akademik A4 4-3-3-4) */
+.official-doc-paper,
+.official-doc-page {
+  background: #ffffff;
+  color: #000000;
+  width: 210mm;
+  min-height: 297mm;
+  max-width: 100%;
+  margin: 0 auto;
+  /* Standar Margin Akademik Indonesia: Kiri 4cm (40mm), Atas 3cm (30mm), Kanan 3cm (30mm), Bawah 3cm (30mm) */
+  padding: 30mm 30mm 30mm 40mm;
+  /* Tanpa border/bayangan tepi agar hasil cetak PDF bersih tanpa garis sisa */
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+  border-radius: 0 !important;
+  font-family: 'Times New Roman', Times, serif;
+  line-height: 1.35;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.doc-page-body {
+  flex: 1;
+  width: 100%;
+}
+
+/* Bersih tanpa watermark latar */
+.official-doc-paper.is-draft,
+.official-doc-page.is-draft,
+.official-doc-paper.is-official,
+.official-doc-page.is-official {
+  background-image: none !important;
+}
+
+/* Nonaktifkan ::before pseudo-element agar tidak merusak bounding-box canvas */
+.official-doc-paper.is-draft::before,
+.official-doc-page.is-draft::before,
+.official-doc-paper.is-official::before,
+.official-doc-page.is-official::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Continuation Header (Lembar 2 & Seterusnya) */
+.doc-continuation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #000000;
+  margin-bottom: 18px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.continuation-univ {
+  font-size: 10pt;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: #000000;
+}
+
+.continuation-prodi {
+  font-size: 8.5pt;
+  color: #334155;
+  margin-top: 2px;
+}
+
+.continuation-meta {
+  text-align: right;
+  font-size: 8.5pt;
+  line-height: 1.35;
+  color: #0f172a;
+}
+
+/* Running Footer (Halaman X dari Y) - Hidden per user request */
+.doc-page-footer {
+  display: none !important;
+}
+
+/* Official Kop Surat (Header) */
+.kop-surat {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 3px double #000000;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.kop-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.kop-text {
+  flex: 1;
+  text-align: center;
+}
+
+.kop-instansi-1 {
+  font-size: 13pt;
+  font-weight: normal;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.kop-instansi-2 {
+  font-size: 15pt;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.kop-kampus {
+  font-size: 13pt;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.kop-prodi {
+  font-size: 11pt;
+  font-weight: bold;
+}
+
+.kop-alamat {
+  font-size: 8.5pt;
+  margin-top: 3px;
+  line-height: 1.25;
+}
+
+/* Document Title & Number */
+.doc-heading {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.doc-main-title {
+  font-size: 12.5pt;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-decoration: underline;
+  margin-bottom: 3px;
+}
+
+.doc-number {
+  font-size: 10pt;
+}
+
+/* Formal Paragraphs */
+.doc-paragraph {
+  font-size: 11pt;
+  text-align: justify;
+  margin-bottom: 14px;
+  text-indent: 35px;
+}
+
+.doc-paragraph-noindent {
+  font-size: 11pt;
+  text-align: justify;
+  margin-bottom: 12px;
+}
+
+/* Identity Table */
+.doc-identity-table {
+  width: 100%;
+  margin: 10px 0 14px 0;
+  border-collapse: collapse;
+  font-size: 10.5pt;
+}
+
+.doc-identity-table td {
+  padding: 2.5px 4px;
+  vertical-align: top;
+}
+
+.doc-identity-table td.label-col {
+  width: 140px;
+}
+
+.doc-identity-table td.colon-col {
+  width: 12px;
+  text-align: center;
+}
+
+/* Academic Tables (KRS, KHS, Transkrip) */
+.doc-academic-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 9.5pt;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.doc-academic-table th, .doc-academic-table td {
+  border: 1px solid #000000;
+  padding: 5px 8px;
+}
+
+.doc-academic-table th {
+  background-color: #f1f5f9;
+  font-weight: bold;
+  text-align: center;
+}
+
+.doc-academic-table td.text-center { text-align: center; }
+.doc-academic-table td.text-right { text-align: right; }
+
+.doc-summary-box {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #f8fafc;
+  border: 1px solid #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9.5pt;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Signature & Stamp Section */
+.doc-signature-wrapper {
+  margin-top: 36px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  page-break-inside: avoid;
+}
+
+.doc-qr-verification {
+  display: none !important;
+}
+
+.doc-qr-box {
+  width: 85px;
+  height: 85px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doc-qr-label {
+  font-size: 7.5pt;
+  color: #475569;
+  font-family: Arial, sans-serif;
+  line-height: 1.2;
+}
+
+.doc-sign-block {
+  width: 240px;
+  text-align: left;
+  font-size: 11pt;
+  position: relative;
+}
+
+.sign-date {
+  margin-bottom: 4px;
+}
+
+.sign-role {
+  font-weight: normal;
+  line-height: 1.25;
+}
+
+.sign-visual-container {
+  height: 95px;
+  position: relative;
+  margin: 4px 0;
+}
+
+.sign-ttd-img {
+  position: absolute;
+  left: 20px;
+  top: 5px;
+  width: 170px;
+  height: auto;
+  z-index: 2;
+}
+
+.sign-stamp-img {
+  position: absolute;
+  left: -25px;
+  top: -8px;
+  width: 125px;
+  height: 125px;
+  z-index: 1;
+  opacity: 0.88;
+}
+
+.sign-name {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.sign-nip {
+  font-size: 10pt;
+}
+
+/* Print Handling */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0 !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    padding: 0 !important;
+  }
+
+  body.modal-open .main-wrapper {
+    display: none !important;
+  }
+
+  .top-navbar,
+  .role-switcher-container,
+  .modal-header,
+  .modal-close-btn,
+  .app-footer,
+  .btn,
+  .no-print,
+  .print-actions {
+    display: none !important;
+  }
+
+  .modal-overlay {
+    position: static !important;
+    background: none !important;
+    padding: 0 !important;
+  }
+
+  .modal-box {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .modal-content-scroll {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .doc-pages-wrapper {
+    display: block !important;
+    gap: 0 !important;
+    width: 100% !important;
+  }
+
+  .official-doc-paper,
+  .official-doc-page {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 30mm 30mm 30mm 40mm !important; /* Standar Akademik Indonesia: Kiri 4cm, Atas 3cm, Kanan 3cm, Bawah 3cm */
+    width: 210mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    height: auto !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+
+  .official-doc-paper:last-child,
+  .official-doc-page:last-child {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .doc-academic-table thead {
+    display: table-header-group !important;
+  }
+
+  .doc-academic-table tr {
+    page-break-inside: avoid !important;
+  }
+
+  .doc-signature-wrapper {
+    page-break-inside: avoid !important;
+  }
+}
