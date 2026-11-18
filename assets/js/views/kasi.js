@@ -6,21 +6,9 @@
  */
 
 const KasiView = (() => {
-  async function render(container) {
+  function render(container) {
     const user = AuthManager.getCurrentUser();
-    if (!user || user.role !== 'kasi') {
-      return;
-    }
-
-    try {
-      await QueueSlaManager.syncFromDatabase();
-    } catch (e) {
-      console.warn('Sync kasi view failed, fallback to local cache:', e);
-    }
-
-    // Cek kembali status login setelah await (mencegah overwrite jika user baru saja klik Keluar)
-    const activeUser = AuthManager.getCurrentUser();
-    if (!activeUser || activeUser.role !== 'kasi' || !container) {
+    if (!user || user.role !== 'kasi' || !container) {
       return;
     }
 
@@ -431,6 +419,11 @@ const KasiView = (() => {
         </div>
       </div>
     `;
+
+    // Background sync: sinkronkan data terbaru dari cloud PostgreSQL tanpa memblokir UI
+    if (typeof QueueSlaManager !== 'undefined' && QueueSlaManager.syncFromDatabase) {
+      QueueSlaManager.syncFromDatabase().catch(() => {});
+    }
   }
 
   function formatIndonesianDate(date = new Date()) {

@@ -14,22 +14,9 @@ const StaffView = (() => {
     render(document.getElementById('viewContainer'));
   }
 
-  async function render(container) {
+  function render(container) {
     const user = AuthManager.getCurrentUser();
-    if (!user || user.role !== 'staff') {
-      return;
-    }
-
-    // Pastikan data teranyar dari cloud PostgreSQL telah diambil (Multi-Device Sync)
-    try {
-      await QueueSlaManager.syncFromDatabase();
-    } catch (e) {
-      console.warn('Sync staff view failed, fallback to local cache:', e);
-    }
-
-    // Cek kembali status login setelah await (mencegah overwrite jika user baru saja klik Keluar)
-    const activeUser = AuthManager.getCurrentUser();
-    if (!activeUser || activeUser.role !== 'staff' || !container) {
+    if (!user || user.role !== 'staff' || !container) {
       return;
     }
 
@@ -313,6 +300,11 @@ const StaffView = (() => {
         </div>
       </div>
     `;
+
+    // Background sync: sinkronkan data terbaru dari cloud PostgreSQL tanpa memblokir UI
+    if (typeof QueueSlaManager !== 'undefined' && QueueSlaManager.syncFromDatabase) {
+      QueueSlaManager.syncFromDatabase().catch(() => {});
+    }
   }
 
   function setFilter(filter) {

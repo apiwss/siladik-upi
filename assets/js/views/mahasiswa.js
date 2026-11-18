@@ -14,60 +14,35 @@ const MahasiswaView = (() => {
     render(document.getElementById('viewContainer'));
   }
 
-  async function render(container) {
+  function render(container) {
     const user = AuthManager.getCurrentUser();
 
-    if (!user || user.role !== 'mahasiswa') {
+    if (!user || user.role !== 'mahasiswa' || !container) {
       return;
     }
 
-    // Sinkronkan data terbaru dari cloud PostgreSQL sebelum merender riwayat
-    try {
-      await QueueSlaManager.syncFromDatabase();
-    } catch (e) {
-      console.warn('Sync antrean mahasiswa failed, fallback to local cache:', e);
+    // Ambil data profil mahasiswa dari database lokal SIAKAD jika tersedia
+    let localStudent = null;
+    if (typeof SiakadApi !== 'undefined' && SiakadApi.databaseSiakad && SiakadApi.databaseSiakad[user.nim]) {
+      localStudent = SiakadApi.databaseSiakad[user.nim];
     }
 
-    // Cek kembali status login setelah await sync (mencegah overwrite jika user baru saja klik Keluar)
-    let activeUser = AuthManager.getCurrentUser();
-    if (!activeUser || activeUser.role !== 'mahasiswa' || !container) {
-      return;
-    }
-
-    // Ambil data profil mahasiswa langsung dari SIAKAD / PostgreSQL
-    let student = null;
-
-    try {
-      student = await SiakadApi.getStudentByNim(activeUser.nim);
-    } catch (e) {
-      console.warn('Gagal mengambil data mahasiswa dari API:', e);
-    }
-
-    // Cek kembali status login setelah await SiakadApi
-    activeUser = AuthManager.getCurrentUser();
-    if (!activeUser || activeUser.role !== 'mahasiswa' || !container) {
-      return;
-    }
-
-    // Pastikan data mahasiswa SELALU sesuai dengan identitas user yang sedang login
-    if (!student || String(student.nim).trim() !== String(user.nim).trim()) {
-      student = {
-        nim: user.nim,
-        nama: user.nama,
-        email: user.email || `${user.nim}@upi.edu`,
-        prodi: user.prodi || 'S1 Bisnis Digital',
-        currentSemester: Number(user.currentSemester ?? user.semester_berjalan ?? 1),
-        totalSksLulus: Number(user.totalSksLulus ?? user.total_sks_lulus ?? 0),
-        ipk: user.ipk !== undefined ? Number(user.ipk) : 0.00,
-        statusAkademik: 'Aktif',
-        statusSpp: user.statusSpp || 'Lunas',
-        dosen_pa: user.dosen_pa || 'Muhammad Rizki Nugraha, S.Pd., M.T.',
-        riwayatSemester: student?.riwayatSemester || {}
-      };
-    }
+    const student = {
+      nim: user.nim,
+      nama: user.nama,
+      email: user.email || `${user.nim}@upi.edu`,
+      prodi: user.prodi || 'S1 Bisnis Digital',
+      currentSemester: Number(user.currentSemester ?? user.semester_berjalan ?? localStudent?.currentSemester ?? 1),
+      totalSksLulus: Number(user.totalSksLulus ?? user.total_sks_lulus ?? localStudent?.totalSksLulus ?? 0),
+      ipk: user.ipk !== undefined ? Number(user.ipk) : (localStudent?.ipk || 0.00),
+      statusAkademik: 'Aktif',
+      statusSpp: user.statusSpp || localStudent?.statusSpp || 'Lunas',
+      dosen_pa: user.dosen_pa || 'Muhammad Rizki Nugraha, S.Pd., M.T.',
+      riwayatSemester: localStudent?.riwayatSemester || {}
+    };
 
     const currentSemester = Number(
-      student?.currentSemester ?? student?.semesterAktif ?? user.currentSemester ?? 1
+      student.currentSemester ?? 1
     );
 
     const requests = QueueSlaManager.getRequestsByNim(student.nim);
@@ -548,6 +523,11 @@ const MahasiswaView = (() => {
     handleDocTypeChange(
       document.getElementById('docTypeSelect')?.value || 'skma'
     );
+
+    // Background sync: sinkronkan data terbaru dari cloud PostgreSQL tanpa memblokir UI
+    if (typeof QueueSlaManager !== 'undefined' && QueueSlaManager.syncFromDatabase) {
+      QueueSlaManager.syncFromDatabase().catch(() => {});
+    }
   }
 
   /**
