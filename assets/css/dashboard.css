@@ -1770,3 +1770,416 @@
   border-color: #0284c7;
   background: #f0f9ff;
 }
+
+/* ===================================================================
+   MODAL PROCESS LAYOUT
+   =================================================================== */
+.staff-modal-process-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ===================================================================
+   COMPREHENSIVE MOBILE-FIRST RESPONSIVE ENGINE (ALL SMARTPHONES)
+   iPhone (SE/12/13/14/15/16/Pro/Max), Samsung Galaxy, Xiaomi, Oppo, Vivo, Realme
+   =================================================================== */
+
+@media (max-width: 768px) {
+  /* 1. Main Viewport & Layout */
+  .main-wrapper {
+    padding: 0.85rem 0.65rem 2rem 0.65rem !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow-x: hidden;
+  }
+
+  /* 2. Top Navbar - Clean, Compact & Touch-Friendly */
+  .top-navbar {
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  .navbar-container {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+
+  .brand-wrapper {
+    gap: 0.45rem !important;
+    align-items: center !important;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .brand-logo {
+    width: 32px !important;
+    height: 32px !important;
+    flex-shrink: 0;
+  }
+
+  .brand-text-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .brand-title {
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    line-height: 1.2;
+  }
+
+  .brand-badge {
+    display: none !important; /* Hide long badge on mobile to prevent navbar explosion */
+  }
+
+  .brand-subtitle {
+    display: none !important; /* Save vertical screen estate on mobile */
+  }
+
+  .navbar-actions {
+    width: auto !important;
+    padding-top: 0 !important;
+    overflow-x: visible !important;
+    flex-shrink: 0;
+  }
+
+  .user-profile-badge {
+    padding: 0.25rem 0.5rem !important;
+    gap: 0.35rem !important;
+    max-width: 140px;
+  }
+
+  .avatar-circle {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 0.7rem !important;
+    flex-shrink: 0;
+  }
+
+  .user-name {
+    font-size: 0.72rem !important;
+    max-width: 85px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .user-role-label {
+    display: none !important; /* Avatar & name are sufficient on mobile */
+  }
+
+  .logout-nav-btn {
+    padding: 0.25rem 0.55rem !important;
+    font-size: 0.7rem !important;
+    gap: 0.2rem !important;
+    border-radius: 8px !important;
+  }
+
+  /* 3. Executive Role Banner (All Actors) */
+  .portal-header-banner,
+  .student-profile-banner,
+  .admin-header-card {
+    padding: 1.15rem 0.95rem !important;
+    border-radius: 14px !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .portal-header-banner h2,
+  .student-profile-banner h2 {
+    font-size: 1.12rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .portal-header-banner p,
+  .student-profile-banner p {
+    font-size: 0.78rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .portal-role-chip {
+    font-size: 0.65rem !important;
+    padding: 0.25rem 0.65rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .profile-avatar-large {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 1rem !important;
+  }
+
+  /* 4. Student Data Grid in Banner (2x2 Neat Grid) */
+  .student-data-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  .data-cell-label {
+    font-size: 0.65rem !important;
+  }
+
+  .data-cell-value {
+    font-size: 0.8rem !important;
+  }
+
+  /* 5. KPI Stats Grid (Compact 2x2 Grid instead of 1 giant stacked column!) */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .stat-card {
+    padding: 0.75rem 0.8rem !important;
+    border-radius: 12px !important;
+  }
+
+  .stat-card-title {
+    font-size: 0.72rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .stat-value {
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    margin: 0.2rem 0 !important;
+  }
+
+  .stat-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .stat-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .stat-meta {
+    font-size: 0.65rem !important;
+    line-height: 1.2 !important;
+  }
+
+  /* 6. Card & Card Header (Fixes Squished Title & Cut-Off Tabs in Mobile) */
+  .card {
+    border-radius: 14px !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .card-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 0.65rem !important;
+    padding: 0.85rem 0.85rem !important;
+  }
+
+  .card-title {
+    font-size: 0.92rem !important;
+    width: 100% !important;
+    line-height: 1.3 !important;
+  }
+
+  .card-title svg {
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0;
+  }
+
+  /* Native App-Like Horizontal Swipeable Filter Tabs */
+  .card-header > div:last-child,
+  .queue-filter-tabs {
+    width: 100% !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 0.4rem !important;
+    padding-bottom: 4px !important;
+    scrollbar-width: none !important;
+  }
+
+  .card-header > div:last-child::-webkit-scrollbar,
+  .queue-filter-tabs::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .card-header .btn-sm,
+  .queue-filter-tabs .btn-sm {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-size: 0.725rem !important;
+    padding: 0.35rem 0.65rem !important;
+    border-radius: 20px !important;
+  }
+
+  /* 7. Data Tables on Mobile (Smooth Horizontal Swipe + Min-Width) */
+  .data-table-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border: none !important;
+    border-radius: 0 0 14px 14px !important;
+  }
+
+  .data-table {
+    min-width: 620px !important; /* Preserves column geometry so text never squishes */
+    width: 100% !important;
+  }
+
+  .data-table th {
+    padding: 0.65rem 0.65rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .data-table td {
+    padding: 0.75rem 0.65rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .badge-queue-no {
+    font-size: 0.72rem !important;
+    padding: 0.2rem 0.5rem !important;
+  }
+
+  /* 8. Dashboard Layout Grid (Forms + Tables stack cleanly) */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  /* 9. Form Inputs - Anti-iOS Zoom & Full Touch Target */
+  .form-control,
+  .form-select,
+  .siladik-form-input {
+    font-size: 16px !important; /* Mencegah iOS Safari auto-zoom yang mengganggu */
+    padding: 0.65rem 0.85rem !important;
+    border-radius: 10px !important;
+  }
+
+  .form-label,
+  .siladik-role-label {
+    font-size: 0.78rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  /* 10. Modals on Mobile */
+  .modal-overlay {
+    padding: 0.5rem !important;
+  }
+
+  .modal-box {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 94vh !important;
+    border-radius: 16px !important;
+  }
+
+  .modal-header {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .modal-title {
+    font-size: 0.95rem !important;
+  }
+
+  .modal-content-scroll {
+    padding: 0.85rem !important;
+  }
+
+  .staff-modal-process-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  /* 11. Login Page on Mobile */
+  body.portal-landing-mode .main-wrapper {
+    padding: 0.75rem 0.65rem 2rem 0.65rem !important;
+  }
+
+  body.portal-landing-mode .siladik-auth-container {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  body.portal-landing-mode .siladik-hero-panel {
+    padding: 0.5rem !important;
+    text-align: center;
+  }
+
+  .sintesys-hero-headline {
+    font-size: 1.6rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .sintesys-hero-tagline {
+    font-size: 0.82rem !important;
+  }
+
+  body.portal-landing-mode .siladik-modern-card {
+    padding: 1.35rem 1rem !important;
+    border-radius: 20px !important;
+    max-width: 100% !important;
+  }
+
+  .siladik-role-selector {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.3rem !important;
+  }
+
+  .siladik-role-chip {
+    padding: 0.45rem 0.15rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .siladik-demo-buttons {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.4rem !important;
+  }
+
+  .siladik-demo-btn {
+    padding: 0.45rem 0.5rem !important;
+    font-size: 0.72rem !important;
+    justify-content: center !important;
+  }
+
+  /* 12. KASI Charts on Mobile */
+  .kasi-chart-container {
+    margin-left: 2.2rem !important;
+    margin-right: 0.5rem !important;
+    padding: 1rem 0.5rem 2rem 0.5rem !important;
+  }
+
+  .kasi-barchart-card {
+    padding: 0.85rem !important;
+  }
+}
+
+/* Extra small devices (iPhone SE, Galaxy Fold outer screen, sub-380px) */
+@media (max-width: 380px) {
+  .brand-title {
+    font-size: 0.85rem !important;
+  }
+
+  .user-name {
+    max-width: 65px !important;
+  }
+
+  .stat-value {
+    font-size: 1.15rem !important;
+  }
+
+  .stat-card {
+    padding: 0.65rem 0.65rem !important;
+  }
+}

@@ -116,7 +116,7 @@ const StaffView = (() => {
           </div>
 
           <!-- Queue Filter Tabs -->
-          <div style="display: flex; gap: 0.4rem;">
+          <div class="queue-filter-tabs" style="display: flex; gap: 0.4rem;">
             <button class="btn btn-sm ${activeFilter === 'all' ? 'btn-teal' : 'btn-secondary'}" onclick="StaffView.setFilter('all')">Semua (${allRequests.length})</button>
             <button class="btn btn-sm ${activeFilter === 'pending' ? 'btn-teal' : 'btn-secondary'}" onclick="StaffView.setFilter('pending')">Antrean FIFO (${allRequests.filter(r => r.status === 'antrean').length})</button>
             <button class="btn btn-sm ${activeFilter === 'review' ? 'btn-teal' : 'btn-secondary'}" onclick="StaffView.setFilter('review')">Review Draf Dokumen (${allRequests.filter(r => r.status === 'verifikasi_staf').length})</button>
@@ -201,7 +201,7 @@ const StaffView = (() => {
     const modalTitle = `Verifikasi & Eksekusi: ${req.queueNo} - ${req.docTitle}`;
 
     const modalContent = `
-      <div style="display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start;">
+      <div class="staff-modal-process-layout">
         <!-- Left Panel: Alur Tanda Tangan Fisik & Kontrol -->
         <div>
           <!-- Info Mahasiswa -->
