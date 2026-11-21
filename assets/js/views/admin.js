@@ -686,6 +686,10 @@ const AdminView = (() => {
           </div>
         </div>
 
+        <div class="table-scroll-indicator">
+          <span class="tsi-arrow">👉</span>
+          <span>Geser tabel ke samping untuk melihat detail pengguna ➔</span>
+        </div>
         <div class="table-responsive">
           <table class="admin-table">
             <thead>
@@ -835,6 +839,10 @@ const AdminView = (() => {
           </div>
         </div>
 
+        <div class="table-scroll-indicator">
+          <span class="tsi-arrow">👉</span>
+          <span>Geser tabel ke samping untuk melihat detail pengguna ➔</span>
+        </div>
         <div class="table-responsive">
           <table class="admin-table">
             <thead>
@@ -955,6 +963,10 @@ const AdminView = (() => {
           </div>
         </div>
 
+        <div class="table-scroll-indicator">
+          <span class="tsi-arrow">👉</span>
+          <span>Geser tabel ke samping untuk melihat detail pengguna ➔</span>
+        </div>
         <div class="table-responsive">
           <table class="admin-table">
             <thead>
@@ -1106,6 +1118,10 @@ const AdminView = (() => {
           <span>Fitur <strong>Impor Nilai Massal</strong>: Admin dapat mengunggah file Excel nilai mahasiswa per semester sekaligus tanpa input manual satu per satu. Seluruh draf KHS dan Transkrip Nilai mahasiswa otomatis diperbarui secara instan.</span>
         </div>
 
+        <div class="table-scroll-indicator">
+          <span class="tsi-arrow">👉</span>
+          <span>Geser tabel ke samping untuk melihat detail pengguna ➔</span>
+        </div>
         <div class="table-responsive">
           <table class="admin-table">
             <thead>
@@ -3122,6 +3138,10 @@ const AdminView = (() => {
           <span>Fitur ini mendukung <strong>Asas Keberlanjutan Mandiri</strong>: Admin dapat mengekspor/mengimpor daftar mahasiswa dari Excel serta menaikkan semester massal mahasiswa aktif secara mandiri (mahasiswa berstatus <em>Cuti</em> otomatis dilewati).</span>
         </div>
 
+        <div class="table-scroll-indicator">
+          <span class="tsi-arrow">👉</span>
+          <span>Geser tabel ke samping untuk melihat detail pengguna ➔</span>
+        </div>
         <div class="table-responsive">
           <table class="admin-table">
             <thead>

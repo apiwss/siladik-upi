@@ -850,6 +850,16 @@
   outline: none;
 }
 
+/* Responsive Table Container */
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  display: block;
+  position: relative;
+}
+
 /* Table Design */
 .admin-table {
   width: 100%;
@@ -2033,15 +2043,14 @@
     border-radius: 20px !important;
   }
 
-  /* 7. Data Tables on Mobile (Smooth Horizontal Swipe + Min-Width + Touch Action) */
-  .data-table-wrapper {
+  /* 7. Data Tables & Admin Tables on Mobile (Smooth Native Horizontal Swipe + Non-Squish Geometry) */
+  .data-table-wrapper,
+  .table-responsive {
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-x pan-y !important;
-    overscroll-behavior-x: contain !important;
     border: none !important;
     border-radius: 0 0 14px 14px !important;
     position: relative !important;
@@ -2049,40 +2058,147 @@
   }
 
   /* Visible mobile horizontal scrollbar */
-  .data-table-wrapper::-webkit-scrollbar {
-    height: 7px !important;
+  .data-table-wrapper::-webkit-scrollbar,
+  .table-responsive::-webkit-scrollbar {
+    height: 6px !important;
     display: block !important;
   }
 
-  .data-table-wrapper::-webkit-scrollbar-track {
+  .data-table-wrapper::-webkit-scrollbar-track,
+  .table-responsive::-webkit-scrollbar-track {
     background: #f1f5f9 !important;
     border-radius: 4px !important;
   }
 
-  .data-table-wrapper::-webkit-scrollbar-thumb {
+  .data-table-wrapper::-webkit-scrollbar-thumb,
+  .table-responsive::-webkit-scrollbar-thumb {
     background: #94a3b8 !important;
     border-radius: 4px !important;
   }
 
-  .data-table {
-    min-width: 680px !important; /* Preserves column geometry so text never squishes */
+  .data-table,
+  .admin-table {
+    min-width: 780px !important; /* Preserves column geometry so text never squishes */
     width: max-content !important;
     display: table !important;
+    border-collapse: collapse !important;
   }
 
-  .data-table th {
-    padding: 0.65rem 0.65rem !important;
-    font-size: 0.68rem !important;
+  .data-table th,
+  .admin-table thead th {
+    white-space: nowrap !important;
+    padding: 0.65rem 0.75rem !important;
+    font-size: 0.72rem !important;
   }
 
-  .data-table td {
-    padding: 0.75rem 0.65rem !important;
+  .data-table td,
+  .admin-table tbody td {
+    white-space: nowrap !important;
+    padding: 0.75rem 0.75rem !important;
     font-size: 0.78rem !important;
   }
 
   .badge-queue-no {
     font-size: 0.72rem !important;
     padding: 0.2rem 0.5rem !important;
+  }
+
+  /* Admin Cards, Toolbars & Action Buttons on Mobile */
+  .admin-panel-card {
+    border-radius: 14px !important;
+    margin-bottom: 1rem !important;
+    overflow: hidden !important;
+  }
+
+  .admin-card-header,
+  .admin-card-header-simple {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 0.75rem !important;
+    padding: 0.85rem 0.85rem !important;
+  }
+
+  .admin-card-header-info {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .admin-card-header h3,
+  .admin-card-header-simple h3 {
+    font-size: 0.95rem !important;
+    line-height: 1.35 !important;
+    flex-wrap: wrap !important;
+  }
+
+  .admin-card-header p,
+  .admin-card-header-simple p {
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .admin-card-header-actions,
+  .admin-action-btn-group {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.45rem !important;
+  }
+
+  .admin-card-header-actions .btn,
+  .admin-action-btn-group .btn,
+  .btn-excel-export,
+  .btn-excel-import {
+    font-size: 0.725rem !important;
+    padding: 0.4rem 0.65rem !important;
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  .admin-subtoolbar {
+    padding: 0.75rem 0.85rem !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+
+  .admin-search-box {
+    width: 100% !important;
+  }
+
+  .admin-search-box input {
+    width: 100% !important;
+    font-size: 0.78rem !important;
+    padding: 0.5rem 0.75rem 0.5rem 2.2rem !important;
+  }
+
+  .admin-filter-select {
+    width: 100% !important;
+    font-size: 0.78rem !important;
+    padding: 0.45rem 0.65rem !important;
+  }
+
+  .admin-tabs-bar {
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding: 0.35rem !important;
+    gap: 0.35rem !important;
+  }
+
+  .admin-tabs-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .admin-tab-btn {
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .admin-info-banner {
+    padding: 0.65rem 0.85rem !important;
+    font-size: 0.75rem !important;
+    gap: 0.5rem !important;
   }
 
   /* Mobile Horizontal Scroll Indicator Banner */

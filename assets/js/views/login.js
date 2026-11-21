@@ -168,8 +168,9 @@ const LoginView = (() => {
                       type="text"
                       id="loginIdentifierInput"
                       class="siladik-form-input"
-                      placeholder="Masukkan NIM Anda"
-                      value="2312017"
+                      placeholder="Masukkan NIM Anda (contoh: 2312017)"
+                      value=""
+                      autocomplete="username"
                       required />
                   </div>
                 </div>
@@ -178,7 +179,7 @@ const LoginView = (() => {
                 <div class="siladik-input-group">
                   <div style="display:flex; justify-content:space-between; align-items:center;">
                     <label class="siladik-role-label">Kata Sandi</label>
-                    <a href="javascript:void(0)" onclick="App.showToast('Gunakan kata sandi bawaan: password123', 'info')" style="font-size:0.75rem; color:#991b1b; text-decoration:none;">Lupa sandi?</a>
+                    <a href="javascript:void(0)" onclick="App.showToast('Gunakan kata sandi akun Anda (bawaan: password123)', 'info')" style="font-size:0.75rem; color:#991b1b; text-decoration:none;">Lupa sandi?</a>
                   </div>
                   <div class="siladik-input-box">
                     <svg class="siladik-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -187,8 +188,9 @@ const LoginView = (() => {
                       id="loginPasswordInput"
                       class="siladik-form-input"
                       style="padding-right: 2.75rem;"
-                      value="password123"
-                      placeholder="••••••••••••"
+                      value=""
+                      placeholder="Masukkan kata sandi Anda"
+                      autocomplete="current-password"
                       required />
                     <button
                       type="button"
@@ -358,27 +360,25 @@ const LoginView = (() => {
     const label = document.getElementById('labelIdentifier');
     if (!input || !label) return;
 
+    input.value = '';
     if (role === 'mahasiswa') {
       label.textContent = 'Nomor Induk Mahasiswa (NIM)';
-      input.placeholder = 'Contoh: 2312017';
-      input.value = '2312017';
+      input.placeholder = 'Masukkan NIM (contoh: 2312017)';
     } else if (role === 'staf') {
       label.textContent = 'NIP / ID Staf Akademik (TU)';
-      input.placeholder = 'Contoh: 198703142014041001';
-      input.value = '198703142014041001';
+      input.placeholder = 'Masukkan NIP (contoh: 198703142014041001)';
     } else if (role === 'kasi') {
       label.textContent = 'NIP / ID Pimpinan / KASI';
-      input.placeholder = 'Contoh: 199105202020121008';
-      input.value = '199105202020121008';
+      input.placeholder = 'Masukkan NIP (contoh: 199105202020121008)';
     } else if (role === 'admin') {
       label.textContent = 'ID Pengguna Administrator';
-      input.placeholder = 'Contoh: ADMIN001';
-      input.value = 'ADMIN001';
+      input.placeholder = 'Masukkan ID Admin (contoh: ADMIN001)';
     }
 
     const pwdInput = document.getElementById('loginPasswordInput');
     if (pwdInput) {
-      pwdInput.value = 'password123';
+      pwdInput.value = '';
+      pwdInput.placeholder = 'Masukkan kata sandi Anda';
     }
   }
 
