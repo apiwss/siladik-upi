@@ -209,29 +209,6 @@ const LoginView = (() => {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </button>
               </form>
-
-              <!-- Quick 1-Click Demo -->
-              <div class="siladik-demo-strip">
-                <div class="siladik-demo-title">Akses Demo 1-Klik</div>
-                <div class="siladik-demo-buttons">
-                  <button type="button" class="siladik-demo-btn" onclick="LoginView.quickLogin('2312017', 'mahasiswa', this)">
-                    <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#2563eb;"></span>
-                    <span>Mahasiswa (Nabil)</span>
-                  </button>
-                  <button type="button" class="siladik-demo-btn" onclick="LoginView.quickLogin('198703142014041001', 'staf', this)">
-                    <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#0d9488;"></span>
-                    <span>Staf TU (Budi)</span>
-                  </button>
-                  <button type="button" class="siladik-demo-btn" onclick="LoginView.quickLogin('199105202020121008', 'kasi', this)">
-                    <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#7c3aed;"></span>
-                    <span>KASI (M. Rizki)</span>
-                  </button>
-                  <button type="button" class="siladik-demo-btn" onclick="LoginView.quickLogin('ADMIN001', 'admin', this)">
-                    <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#dc2626;"></span>
-                    <span>Administrator</span>
-                  </button>
-                </div>
-              </div>
             </div>
 
             <!-- TAB 2: DAFTAR AKUN BARU (KHUSUS MAHASISWA) -->
