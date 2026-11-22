@@ -714,9 +714,20 @@ const KasiView = (() => {
     App.printDocument(reportHtml, 'Laporan Kinerja KASI UPI Tasikmalaya');
   }
 
-  function refreshData() {
-    render(document.getElementById('viewContainer'));
-    App.showToast('Data analitik kinerja KASI berhasil diperbarui secara real-time!', 'success');
+  async function refreshData() {
+    const btn = document.querySelector('button[onclick="KasiView.refreshData()"]');
+    if (btn) btn.disabled = true;
+    try {
+      if (typeof QueueSlaManager !== 'undefined' && QueueSlaManager.syncFromDatabase) {
+        await QueueSlaManager.syncFromDatabase();
+      }
+      render(document.getElementById('viewContainer'));
+      App.showToast('Data analitik kinerja KASI berhasil diperbarui secara real-time dari database!', 'success');
+    } catch (e) {
+      render(document.getElementById('viewContainer'));
+    } finally {
+      if (btn) btn.disabled = false;
+    }
   }
 
   return {

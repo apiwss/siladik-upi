@@ -476,6 +476,7 @@ const StaffView = (() => {
   async function executeApproval(reqId) {
     const user = AuthManager.getCurrentUser() || { nama: 'Staf TU Akademik' };
     const staffName = `${user.nama} (Staf TU Akademik)`;
+    const staffNip = user.nomor_induk || user.nip || '';
 
     // Cegah klik ganda selama proses berjalan
     const btn = document.querySelector(`button[onclick="StaffView.executeApproval('${reqId}')"]`);
@@ -485,7 +486,7 @@ const StaffView = (() => {
     }
 
     try {
-      await QueueSlaManager.approveRequest(reqId, staffName);
+      await QueueSlaManager.approveRequest(reqId, staffName, staffNip);
       App.closeModal();
       App.showToast('Dokumen berhasil disahkan dan diterbitkan kepada mahasiswa!', 'success');
       // Sinkronkan ulang dari server atau lokal

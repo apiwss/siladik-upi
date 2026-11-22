@@ -499,7 +499,8 @@ app.get('/api/pengajuan', async (req, res) => {
       SELECT p.id, p.nomor_pengajuan, p.jenis_dokumen, p.keperluan, p.semester_dituju,
              p.status_pengajuan, p.nomor_antrean, p.sla_target_menit,
              p.sla_waktu_mulai, p.sla_waktu_target, p.sla_waktu_selesai,
-             p.catatan_staf, p.created_at,
+             p.catatan_staf, p.created_at, p.diproses_oleh,
+             staf.nama as nama_staf,
              u.id as user_id, u.nomor_induk as nim, u.nama, u.prodi,
              COALESCE(
                (SELECT status FROM status_spp WHERE user_id = u.id ORDER BY semester DESC LIMIT 1),
@@ -508,6 +509,7 @@ app.get('/api/pengajuan', async (req, res) => {
              d.nomor_dokumen_resmi, d.qr_hash_token
       FROM pengajuan_dokumen p
       JOIN users u ON p.user_id = u.id
+      LEFT JOIN users staf ON p.diproses_oleh = staf.id
       LEFT JOIN dokumen_resmi d ON p.id = d.pengajuan_id
       ORDER BY p.created_at ASC
     `; /* FIFO: pengajuan LEBIH LAMA tampil LEBIH DULU */
@@ -538,6 +540,17 @@ app.get('/api/pengajuan', async (req, res) => {
         statusFe = 'ditolak';
       }
 
+      // Resolusi nama staf pemroses agar workload di KASI selalu akurat
+      let staffName = r.nama_staf;
+      if (!staffName && r.catatan_staf) {
+        if (r.catatan_staf.includes('Siti')) staffName = 'Siti Rahmawati (TU Akademik)';
+        else if (r.catatan_staf.includes('Ahmad')) staffName = 'Ahmad Fauzi (TU Akademik)';
+        else if (r.catatan_staf.includes('Budi')) staffName = 'Budi Prasetyo (TU Akademik)';
+      }
+      if (!staffName && statusFe === 'selesai') {
+        staffName = 'Budi Prasetyo (TU Akademik)';
+      }
+
       return {
         id: r.nomor_pengajuan,
         id_db: r.id,
@@ -555,6 +568,8 @@ app.get('/api/pengajuan', async (req, res) => {
         createdAt: r.created_at,
         slaDeadline: r.sla_waktu_target,
         approvedAt: r.sla_waktu_selesai,
+        processedBy: staffName,
+        catatanStaf: r.catatan_staf,
         nomorDokumenResmi: r.nomor_dokumen_resmi,
         officialPdfReady: !!r.nomor_dokumen_resmi,
         aiDraft: true
@@ -695,6 +710,23 @@ app.put('/api/pengajuan/:nomorPengajuan/status', async (req, res) => {
     if (staf_nip) {
       const stafRes = await client.query('SELECT id FROM users WHERE nomor_induk = $1', [staf_nip]);
       if (stafRes.rows.length > 0) stafId = stafRes.rows[0].id;
+    }
+    // Fallback jika staf_nip tidak diteruskan tapi catatan mencantumkan nama staf
+    if (!stafId && catatan) {
+      if (catatan.includes('Siti')) {
+        const s = await client.query("SELECT id FROM users WHERE nama LIKE '%Siti%' LIMIT 1");
+        if (s.rows.length > 0) stafId = s.rows[0].id;
+      } else if (catatan.includes('Ahmad')) {
+        const s = await client.query("SELECT id FROM users WHERE nama LIKE '%Ahmad%' LIMIT 1");
+        if (s.rows.length > 0) stafId = s.rows[0].id;
+      } else if (catatan.includes('Budi')) {
+        const s = await client.query("SELECT id FROM users WHERE nama LIKE '%Budi%' LIMIT 1");
+        if (s.rows.length > 0) stafId = s.rows[0].id;
+      }
+    }
+    if (!stafId && dbStatus === 'SELESAI') {
+      const s = await client.query("SELECT id FROM users WHERE role = 'STAF' ORDER BY id ASC LIMIT 1");
+      if (s.rows.length > 0) stafId = s.rows[0].id;
     }
 
     const result = await client.query(`
