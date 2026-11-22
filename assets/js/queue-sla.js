@@ -45,10 +45,12 @@ const QueueSlaManager = (() => {
           });
           // Urutkan: FIFO (created_at ASC sudah dari server, pastikan dipertahankan)
           merged.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+          const oldSerialized = JSON.stringify(currentLocal);
+          const newSerialized = JSON.stringify(merged);
+          localStorage.setItem(STORAGE_KEY, newSerialized);
           
-          // Hanya broadcast jika pengguna sedang login
-          if (typeof AuthManager !== 'undefined' && AuthManager.getCurrentUser()) {
+          // Hanya broadcast jika data BENAR-BENAR BERUBAH dan pengguna sedang login
+          if (oldSerialized !== newSerialized && typeof AuthManager !== 'undefined' && AuthManager.getCurrentUser()) {
             window.dispatchEvent(new CustomEvent('queue:synced', { detail: merged }));
           }
           return merged;
@@ -226,11 +228,11 @@ const QueueSlaManager = (() => {
 
     getRequestsByNim: (nim) => {
       const list = loadRequests();
+      if (!nim) return [];
+      const cleanNim = String(nim).trim();
 
       return list.filter(
-        r =>
-          r.nim.toString() ===
-          nim.toString()
+        r => r && r.nim && String(r.nim).trim() === cleanNim
       );
     },
 

@@ -2453,6 +2453,22 @@
     margin-bottom: 0.35rem !important;
   }
 
+  #btnSubmitPengajuan {
+    font-size: 0.95rem !important;
+    padding: 0.85rem 1.25rem !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+    position: relative !important;
+    z-index: 5 !important;
+  }
+
+  .btn {
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+  }
+
   /* 10. Modals on Mobile */
   .modal-overlay {
     padding: 0.5rem !important;

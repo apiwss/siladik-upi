@@ -25,8 +25,20 @@ const App = (() => {
 
       if (user.role === 'staff' && typeof StaffView !== 'undefined' && StaffView.render) {
         StaffView.render(container);
-      } else if (user.role === 'mahasiswa' && typeof MahasiswaView !== 'undefined' && MahasiswaView.render) {
-        MahasiswaView.render(container);
+      } else if (user.role === 'mahasiswa' && typeof MahasiswaView !== 'undefined') {
+        // Jika pengguna sedang aktif berinteraksi dengan form pengajuan dokumen,
+        // hanya perbarui riwayat pengajuan di sisi kanan tanpa merusak form!
+        const formEl = document.getElementById('formPengajuanDokumen');
+        const isInteractingWithForm = formEl && (
+          formEl.contains(document.activeElement) ||
+          document.activeElement?.tagName === 'INPUT' ||
+          document.activeElement?.tagName === 'SELECT'
+        );
+        if (isInteractingWithForm && typeof MahasiswaView.updateRiwayatOnly === 'function') {
+          MahasiswaView.updateRiwayatOnly();
+        } else if (MahasiswaView.render) {
+          MahasiswaView.render(container);
+        }
       } else if (user.role === 'kasi' && typeof KasiView !== 'undefined' && KasiView.render) {
         KasiView.render(container);
       }

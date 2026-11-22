@@ -257,7 +257,8 @@ const MahasiswaView = (() => {
                 <button
                   type="submit"
                   id="btnSubmitPengajuan"
-                  class="btn btn-primary btn-block btn-lg">
+                  class="btn btn-primary btn-block btn-lg"
+                  onclick="MahasiswaView.handleSubmit(event)">
 
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="22" y1="2" x2="11" y2="13"/>
@@ -272,9 +273,31 @@ const MahasiswaView = (() => {
         </div>
 
         <!-- Kolom Kanan: Status Pelacakan, Antrean & SLA Countdown -->
-        <div>
+        <div id="mahasiswaRightCol">
+          ${renderRightColumnHtml(requests, activeRequest)}
+        </div>
+      </div>
+    `;
 
-          <!-- Riwayat Pengajuan Mahasiswa (FR-08) -->
+    // Start SLA countdown ticker
+    if (activeRequest) {
+      startSlaTicker(activeRequest);
+    }
+
+    // Trigger initial check on docType
+    handleDocTypeChange(
+      document.getElementById('docTypeSelect')?.value || 'skma'
+    );
+
+    // Background sync: sinkronkan data terbaru dari cloud PostgreSQL tanpa memblokir UI
+    if (typeof QueueSlaManager !== 'undefined' && QueueSlaManager.syncFromDatabase) {
+      QueueSlaManager.syncFromDatabase().catch(() => {});
+    }
+  }
+
+  function renderRightColumnHtml(requests, activeRequest) {
+    return `
+      <!-- Riwayat Pengajuan Mahasiswa (FR-08) -->
           <div class="card">
             <div class="card-header">
               <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 0.5rem;">
@@ -510,23 +533,25 @@ const MahasiswaView = (() => {
               `}
             </div>
           </div>
-        </div>
-      </div>
     `;
+  }
 
-    // Start SLA countdown ticker
+  function updateRiwayatOnly() {
+    const user = AuthManager.getCurrentUser();
+    if (!user || user.role !== 'mahasiswa') return;
+    const rightCol = document.getElementById('mahasiswaRightCol');
+    if (!rightCol) return;
+
+    const studentNim = user.nim || user.nomor_induk;
+    const requests = QueueSlaManager.getRequestsByNim(studentNim);
+    const activeRequest = requests.find(
+      r => r.status !== 'selesai' && r.status !== 'ditolak'
+    ) ?? null;
+
+    rightCol.innerHTML = renderRightColumnHtml(requests, activeRequest);
+
     if (activeRequest) {
       startSlaTicker(activeRequest);
-    }
-
-    // Trigger initial check on docType
-    handleDocTypeChange(
-      document.getElementById('docTypeSelect')?.value || 'skma'
-    );
-
-    // Background sync: sinkronkan data terbaru dari cloud PostgreSQL tanpa memblokir UI
-    if (typeof QueueSlaManager !== 'undefined' && QueueSlaManager.syncFromDatabase) {
-      QueueSlaManager.syncFromDatabase().catch(() => {});
     }
   }
 
@@ -685,7 +710,8 @@ const MahasiswaView = (() => {
      * Ambil currentSemester langsung dari SIAKAD
      * setiap kali jenis dokumen berubah.
      */
-    SiakadApi.getStudentByNim(user.nim)
+    const studentNim = user?.nim || user?.nomor_induk;
+    SiakadApi.getStudentByNim(studentNim)
       .then(student => {
         if (!student) {
           throw new Error('Data mahasiswa tidak ditemukan di SIAKAD.');
@@ -752,12 +778,21 @@ const MahasiswaView = (() => {
   }
 
   async function handleSubmit(e) {
-    e.preventDefault();
+    if (e) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
 
     const user = AuthManager.getCurrentUser();
+    const nim = user?.nim || user?.nomor_induk;
 
-    const docType =
-      document.getElementById('docTypeSelect').value;
+    if (!nim) {
+      App.showToast('Gagal memverifikasi identitas mahasiswa. Silakan masuk ulang.', 'error');
+      return;
+    }
+
+    const docTypeEl = document.getElementById('docTypeSelect');
+    const docType = docTypeEl ? docTypeEl.value : 'skma';
 
     let selectedKeperluan =
       document.getElementById('keperluanSelect')?.value || '';
@@ -785,13 +820,22 @@ const MahasiswaView = (() => {
         docType === 'krs' ||
         docType === 'transkrip'
       )
-        ? Number(semesterSelect?.value)
+        ? (semesterSelect?.value ? Number(semesterSelect.value) : 1)
         : null;
+
+    const submitBtn = document.getElementById('btnSubmitPengajuan');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        <span>Mengirim Pengajuan...</span>
+      `;
+    }
 
     try {
       const created =
         await QueueSlaManager.createRequest({
-          nim: user.nim,
+          nim: nim,
           docType,
           keperluan,
           semester
@@ -802,6 +846,10 @@ const MahasiswaView = (() => {
         'success'
       );
 
+      // Reset input keterangan tambahan jika ada
+      const detailInput = document.getElementById('keperluanDetailInput');
+      if (detailInput) detailInput.value = '';
+
       render(
         document.getElementById('viewContainer')
       );
@@ -810,6 +858,18 @@ const MahasiswaView = (() => {
         err.message,
         'error'
       );
+    } finally {
+      const btn = document.getElementById('btnSubmitPengajuan');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Kirim Pengajuan Dokumen
+        `;
+      }
     }
   }
 
@@ -1093,6 +1153,7 @@ const MahasiswaView = (() => {
 
   return {
     render,
+    updateRiwayatOnly,
     toggleMobileViewMode,
     handleDocTypeChange,
     handleKeperluanChange,
