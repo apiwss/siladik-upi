@@ -109,8 +109,8 @@ const AdminView = (() => {
       created_at: '2026-08-01T08:00:00Z',
       semester_berjalan: 7,
       angkatan: 2023,
-      total_sks_lulus: 120,
-      ipk: 3.75,
+      total_sks_lulus: 0,
+      ipk: null,
       dosen_pa: 'Muhammad Rizki Nugraha, S.Pd., M.T.',
       spp_status: 'LUNAS'
     },
@@ -125,8 +125,8 @@ const AdminView = (() => {
       created_at: '2026-08-01T08:00:00Z',
       semester_berjalan: 7,
       angkatan: 2023,
-      total_sks_lulus: 120,
-      ipk: 3.75,
+      total_sks_lulus: 0,
+      ipk: null,
       dosen_pa: 'Muhammad Rizki Nugraha, S.Pd., M.T.',
       spp_status: 'LUNAS'
     }
@@ -145,7 +145,7 @@ const AdminView = (() => {
       nomorDokumenResmi: '411/UN40.D/AK/2026',
       createdAt: '2026-10-25T08:30:00Z',
       tanggalSelesai: '2026-10-26T14:15:00Z',
-      catatanStaf: 'Dokumen transkrip nilai telah diverifikasi SIAKAD dan disahkan dengan TTD & Cap resmi.'
+      catatanStaf: 'Dokumen transkrip nilai telah diverifikasi dan disahkan dengan tanda tangan basah & cap resmi.'
     },
     {
       id: 'REQ-202610-002',
@@ -1094,7 +1094,7 @@ const AdminView = (() => {
           <div class="admin-card-header-info">
             <h3>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-              Katalog Kurikulum & Mata Kuliah SIAKAD
+              Katalog Kurikulum & Pangkalan Mata Kuliah
             </h3>
             <p>Daftar mata kuliah dan bobot SKS resmi untuk penyusunan otomatis draf KRS, KHS, dan Transkrip Nilai.</p>
           </div>
@@ -1222,14 +1222,14 @@ const AdminView = (() => {
 
             <div class="form-group">
               <label class="form-label" for="newIpk">IPK Awal</label>
-              <input type="number" id="newIpk" class="form-control" step="0.01" min="0" max="4.00" value="3.50" />
+              <input type="number" id="newIpk" class="form-control" step="0.01" min="0" max="4.00" value="" placeholder="Kosongkan jika belum ada nilai" />
             </div>
           </div>
 
           <div class="form-row-2">
             <div class="form-group">
               <label class="form-label" for="newSks">Total SKS Lulus</label>
-              <input type="number" id="newSks" class="form-control" min="0" max="160" value="20" />
+              <input type="number" id="newSks" class="form-control" min="0" max="160" value="0" />
             </div>
 
             <div class="form-group">
@@ -1284,7 +1284,9 @@ const AdminView = (() => {
     if (role === 'MAHASISWA') {
       body.semester_berjalan = parseInt(document.getElementById('newSemester').value, 10) || 1;
       body.angkatan = parseInt(document.getElementById('newAngkatan').value, 10) || 2024;
-      body.ipk = parseFloat(document.getElementById('newIpk').value) || 0.00;
+      const newIpkEl = document.getElementById('newIpk');
+      const newIpkVal = newIpkEl ? newIpkEl.value.trim() : '';
+      body.ipk = (newIpkVal !== '' && !isNaN(Number(newIpkVal)) && Number(newIpkVal) > 0) ? parseFloat(newIpkVal) : null;
       body.total_sks_lulus = parseInt(document.getElementById('newSks').value, 10) || 0;
       body.spp_status = (document.getElementById('newSpp') && document.getElementById('newSpp').value) || 'LUNAS';
       body.dosen_pa = document.getElementById('newDosenPa').value.trim();
@@ -1421,7 +1423,7 @@ const AdminView = (() => {
 
             <div class="form-group">
               <label class="form-label" for="editIpk">IPK</label>
-              <input type="number" id="editIpk" class="form-control" step="0.01" min="0" max="4.00" value="${user.ipk || 0.00}" />
+              <input type="number" id="editIpk" class="form-control" step="0.01" min="0" max="4.00" value="${(user.ipk !== null && user.ipk !== undefined && user.ipk !== '' && Number(user.ipk) > 0) ? user.ipk : ''}" placeholder="Kosongkan jika belum ada nilai" />
             </div>
           </div>
 
@@ -1485,7 +1487,9 @@ const AdminView = (() => {
     if (role === 'MAHASISWA') {
       body.semester_berjalan = parseInt(document.getElementById('editSemester').value, 10) || 1;
       body.angkatan = parseInt(document.getElementById('editAngkatan').value, 10) || 2024;
-      body.ipk = parseFloat(document.getElementById('editIpk').value) || 0.00;
+      const editIpkEl = document.getElementById('editIpk');
+      const editIpkVal = editIpkEl ? editIpkEl.value.trim() : '';
+      body.ipk = (editIpkVal !== '' && !isNaN(Number(editIpkVal)) && Number(editIpkVal) > 0) ? parseFloat(editIpkVal) : null;
       body.total_sks_lulus = parseInt(document.getElementById('editSks').value, 10) || 0;
       body.status_spp = document.getElementById('editSpp').value;
       body.dosen_pa = document.getElementById('editDosenPa').value.trim();

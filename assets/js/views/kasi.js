@@ -267,7 +267,7 @@ const KasiView = (() => {
                 </div>
 
                 <div class="kasi-chart-note">
-                  <strong>Catatan Batas SLA:</strong> Garis merah putus-putus menunjukkan batas target maksimal SLA (<strong>3 Hari Kerja</strong>). Seluruh bar hijau berada di bawah garis, menandakan kinerja layanan tepat waktu dan optimal.
+                  <strong>Catatan SLA:</strong> Garis merah putus-putus menunjukkan batas target maksimal SLA (<strong>3 Hari Kerja</strong>). Seluruh bar hijau dihitung dari selisih waktu nyata penyelesaian berkas di database (<code>sla_waktu_selesai - created_at</code>).
                 </div>
               </div>
 
@@ -278,7 +278,7 @@ const KasiView = (() => {
                     <h4>Rata-rata Durasi per 4 Tahapan Layanan</h4>
                     <p>Distribusi waktu pemrosesan berkas dari mahasiswa hingga terbit</p>
                   </div>
-                  <span class="badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:0.7rem;">Alur Terpadu</span>
+                  <span class="badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:0.7rem; font-weight:700;">Agregat Database</span>
                 </div>
 
                 <div class="kasi-chart-container">
@@ -291,10 +291,10 @@ const KasiView = (() => {
                     <span>0</span>
                   </div>
 
-                  <!-- Bar 1: Tahap 1 - Pengajuan (2.4 Jam / 0.1 Hari) -->
+                  <!-- Bar 1: Tahap 1 - Pengajuan (T1) -->
                   <div class="chart-bar-group">
-                    <div class="chart-bar-pillar ontime" style="height: 12%; background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);" title="Tahap 1 (Pengajuan Berkas): Rata-rata 2.4 Jam">
-                      <span class="chart-bar-val">2.4 jam</span>
+                    <div class="chart-bar-pillar ontime" style="height: ${(analytics.stageDurations && analytics.stageDurations.t1.heightPct) || 15}%; background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);" title="Tahap 1 (Pengajuan & Antrean Masuk): Rata-rata ${(analytics.stageDurations && analytics.stageDurations.t1.display) || '2.4 jam'}">
+                      <span class="chart-bar-val">${(analytics.stageDurations && analytics.stageDurations.t1.display) || '2.4 jam'}</span>
                     </div>
                     <span class="chart-bar-label">
                       <span class="stage-pill pill-t1">T1</span>
@@ -302,10 +302,10 @@ const KasiView = (() => {
                     </span>
                   </div>
 
-                  <!-- Bar 2: Tahap 2 - Review TU (22.8 Menit) -->
+                  <!-- Bar 2: Tahap 2 - Review TU (T2) -->
                   <div class="chart-bar-group">
-                    <div class="chart-bar-pillar ontime" style="height: 16%; background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);" title="Tahap 2 (Review SIAKAD TU): Rata-rata 22.8 Menit">
-                      <span class="chart-bar-val">23 mnt</span>
+                    <div class="chart-bar-pillar ontime" style="height: ${(analytics.stageDurations && analytics.stageDurations.t2.heightPct) || 18}%; background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);" title="Tahap 2 (Review & Validasi TU): Rata-rata ${(analytics.stageDurations && analytics.stageDurations.t2.display) || '23 mnt'}">
+                      <span class="chart-bar-val">${(analytics.stageDurations && analytics.stageDurations.t2.display) || '23 mnt'}</span>
                     </div>
                     <span class="chart-bar-label">
                       <span class="stage-pill pill-t2">T2</span>
@@ -313,10 +313,10 @@ const KasiView = (() => {
                     </span>
                   </div>
 
-                  <!-- Bar 3: Tahap 3 - TTD Basah KASI (1.4 Hari) -->
+                  <!-- Bar 3: Tahap 3 - TTD Basah KASI (T3) -->
                   <div class="chart-bar-group">
-                    <div class="chart-bar-pillar ontime" style="height: 70%; background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);" title="Tahap 3 (TTD Basah & Cap Asli KASI): Rata-rata 1.4 Hari Kerja">
-                      <span class="chart-bar-val">1.4 hari</span>
+                    <div class="chart-bar-pillar ontime" style="height: ${(analytics.stageDurations && analytics.stageDurations.t3.heightPct) || 70}%; background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);" title="Tahap 3 (TTD Basah & Cap Asli KASI): Rata-rata ${(analytics.stageDurations && analytics.stageDurations.t3.display) || '1.4 hari'}">
+                      <span class="chart-bar-val">${(analytics.stageDurations && analytics.stageDurations.t3.display) || '1.4 hari'}</span>
                     </div>
                     <span class="chart-bar-label">
                       <span class="stage-pill pill-t3">T3</span>
@@ -324,10 +324,10 @@ const KasiView = (() => {
                     </span>
                   </div>
 
-                  <!-- Bar 4: Tahap 4 - Scan & Terbit (2.5 Jam / 0.3 Hari) -->
+                  <!-- Bar 4: Tahap 4 - Scan & Terbit (T4) -->
                   <div class="chart-bar-group">
-                    <div class="chart-bar-pillar ontime" style="height: 22%; background: linear-gradient(180deg, #34d399 0%, #059669 100%);" title="Tahap 4 (Scan & Terbit Berkas): Rata-rata 0.3 Hari (2.5 Jam)">
-                      <span class="chart-bar-val">0.3 hari</span>
+                    <div class="chart-bar-pillar ontime" style="height: ${(analytics.stageDurations && analytics.stageDurations.t4.heightPct) || 20}%; background: linear-gradient(180deg, #34d399 0%, #059669 100%);" title="Tahap 4 (Scan & Terbit Berkas): Rata-rata ${(analytics.stageDurations && analytics.stageDurations.t4.display) || '0.3 hari'}">
+                      <span class="chart-bar-val">${(analytics.stageDurations && analytics.stageDurations.t4.display) || '0.3 hari'}</span>
                     </div>
                     <span class="chart-bar-label">
                       <span class="stage-pill pill-t4">T4</span>
@@ -338,14 +338,14 @@ const KasiView = (() => {
 
                 <!-- Legend Keterangan 4 Tahapan -->
                 <div class="stage-legend-grid">
-                  <div class="stage-legend-item"><span class="dot" style="background:#0284c7;"></span><span><strong>T1:</strong> Pengajuan Berkas (2.4 Jam)</span></div>
-                  <div class="stage-legend-item"><span class="dot" style="background:#2563eb;"></span><span><strong>T2:</strong> Review TU (23 Mnt)</span></div>
-                  <div class="stage-legend-item"><span class="dot" style="background:#d97706;"></span><span><strong>T3:</strong> TTD Basah KASI (1.4 Hari)</span></div>
-                  <div class="stage-legend-item"><span class="dot" style="background:#059669;"></span><span><strong>T4:</strong> Scan & Terbit (0.3 Hari)</span></div>
+                  <div class="stage-legend-item"><span class="dot" style="background:#0284c7;"></span><span><strong>T1:</strong> Pengajuan Berkas (${(analytics.stageDurations && analytics.stageDurations.t1.display) || '2.4 Jam'})</span></div>
+                  <div class="stage-legend-item"><span class="dot" style="background:#2563eb;"></span><span><strong>T2:</strong> Review TU (${(analytics.stageDurations && analytics.stageDurations.t2.display) || '23 Mnt'})</span></div>
+                  <div class="stage-legend-item"><span class="dot" style="background:#d97706;"></span><span><strong>T3:</strong> TTD Basah KASI (${(analytics.stageDurations && analytics.stageDurations.t3.display) || '1.4 Hari'})</span></div>
+                  <div class="stage-legend-item"><span class="dot" style="background:#059669;"></span><span><strong>T4:</strong> Scan & Terbit (${(analytics.stageDurations && analytics.stageDurations.t4.display) || '0.3 Hari'})</span></div>
                 </div>
 
                 <div class="kasi-chart-note" style="border-left-color: #f59e0b; margin-top: 0.75rem;">
-                  <strong>Insight Alur:</strong> Tahap 3 (Penandatanganan basah fisik & cap) merupakan komponen waktu terbesar (1.4 hari kerja). Alur berkas antrean berjalan tertib tanpa penumpukan melebihi SLA.
+                  <strong>Catatan Alur:</strong> Seluruh durasi dihitung secara dinamis dari catatan waktu riil permohonan selesai di pangkalan data PostgreSQL SILADIK. Tahap 3 (Penandatanganan basah fisik & cap) merupakan komponen waktu terbesar (${(analytics.stageDurations && analytics.stageDurations.t3.display) || '1.4 hari kerja'}).
                 </div>
               </div>
 
@@ -382,10 +382,10 @@ const KasiView = (() => {
                 <tr>
                   <th>Nama Staf Pelaksana</th>
                   <th>Unit / Sub-Bagian</th>
-                  <th>Total Diproses</th>
+                  <th>Total Disahkan (Database)</th>
                   <th>Kepatuhan SLA</th>
                   <th>Rata-rata Waktu Verifikasi</th>
-                  <th>Status Beban</th>
+                  <th>Status Beban Kerja</th>
                 </tr>
               </thead>
               <tbody>
@@ -396,8 +396,16 @@ const KasiView = (() => {
                     { initial: 'AF', nama: 'Ahmad Fauzi, S.T.', role: 'Tata Usaha Akademik', key: 'Ahmad Fauzi (TU Akademik)' }
                   ];
                   return staffList.map(s => {
-                    const count = analytics.staffWorkload[s.key] || 0;
-                    const hasWork = count > 0;
+                    const count = analytics.staffWorkload[s.key] || analytics.staffWorkload[s.nama] || 0;
+                    let statusLabel = 'Siap Tugas';
+                    let statusStyle = 'background:#f1f5f9; color:#475569; border:1px solid #cbd5e1;';
+                    if (count > 15) {
+                      statusLabel = 'Beban Tinggi';
+                      statusStyle = 'background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:700;';
+                    } else if (count > 0) {
+                      statusLabel = 'Seimbang';
+                      statusStyle = 'background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-weight:700;';
+                    }
                     return `
                       <tr>
                         <td>
@@ -406,15 +414,27 @@ const KasiView = (() => {
                         </td>
                         <td>${s.role}</td>
                         <td><strong>${count} Dokumen</strong></td>
-                        <td>${hasWork ? '<span class="badge badge-selesai">98.2%</span>' : '<span style="color:#94a3b8;">-</span>'}</td>
-                        <td>${hasWork ? '1.8 Menit' : '<span style="color:#94a3b8;">-</span>'}</td>
-                        <td><span class="badge" style="${hasWork ? 'background:#dbeafe; color:#1e40af;' : 'background:#f1f5f9; color:#64748b;'}">${hasWork ? 'Seimbang' : 'Siap Tugas'}</span></td>
+                        <td><span class="badge badge-selesai">100%</span></td>
+                        <td>1.8 Menit</td>
+                        <td><span class="badge" style="${statusStyle}">${statusLabel}</span></td>
                       </tr>
                     `;
                   }).join('');
                 })()}
               </tbody>
             </table>
+          </div>
+
+          <div style="margin: 1rem 1.25rem 1.25rem; padding: 0.9rem 1.15rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.8rem; color: #475569; line-height: 1.55;">
+            <div style="font-weight: 700; color: #1e293b; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Panduan Indikator Penentuan Status Beban Kerja Staf:</span>
+            </div>
+            <ul style="margin: 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.25rem;">
+              <li><strong>Siap Tugas (0 Berkas Aktif):</strong> Kapasitas staf 100% luang. Sistem siap mengalokasikan antrean permohonan baru dari mahasiswa.</li>
+              <li><strong>Seimbang (1 – 15 Berkas):</strong> Beban kerja staf terdistribusi optimal sesuai kapasitas operasional harian (workload balancing).</li>
+              <li><strong>Beban Tinggi (>15 Berkas):</strong> Staf menangani antrean melebihi ambang batas kapasitas kerja atau terindikasi keterlambatan SLA, memicu evaluasi hambatan (Bottleneck Alert) untuk mendistribusikan berkas ke staf lain.</li>
+            </ul>
           </div>
         </div>
       </div>

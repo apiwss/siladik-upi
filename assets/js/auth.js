@@ -322,8 +322,8 @@ const AuthManager = (() => {
           }
           setCurrentUser(user);
           return user;
-        } else if (response.status === 400 || response.status === 401 || response.status === 403) {
-          const authErr = new Error(result.message || 'Kredensial login tidak valid.');
+        } else if (response.status === 400 || response.status === 401 || response.status === 403 || response.status === 404) {
+          const authErr = new Error(result.message || 'Nomor Induk (NIM / NIP / ID) atau kata sandi tidak valid.');
           authErr.isAuthError = true;
           throw authErr;
         }
@@ -334,8 +334,8 @@ const AuthManager = (() => {
         backendFailed = true;
       }
 
-      // 2. Fallback Standalone / Offline Mode (Hanya jika PostgreSQL tidak aktif / unreachable)
-      // A. Cek Akun Preset Sistem (Validasi Kata Sandi Wajib 'password123')
+      // 2. Fallback Khusus jika PostgreSQL benar-benar tidak aktif / offline
+      // A. Cek Akun Preset Resmi Sistem (Hanya akun resmi UPI yang terdaftar)
       const presets = Object.values(PRESET_ACCOUNTS);
       const found = presets.find(p => (p.nim === cleanId || p.nip === cleanId || p.nomor_induk === cleanId));
       if (found) {
@@ -360,7 +360,7 @@ const AuthManager = (() => {
         return found;
       }
 
-      // B. Cek dari daftar mahasiswa yang mendaftar mandiri (Validasi Enkripsi SHA-256)
+      // B. Cek dari daftar mahasiswa yang mendaftar mandiri resmi
       const registered = getRegisteredStudents();
       const customStudent = registered.find(s => 
         String(s.nim).trim().toLowerCase() === cleanId.toLowerCase()
@@ -386,37 +386,7 @@ const AuthManager = (() => {
         return customStudent;
       }
 
-      // C. Fallback jika mahasiswa terdaftar di database lokal SiakadApi
-      if (typeof SiakadApi !== 'undefined' && SiakadApi.getStudentByNim) {
-        try {
-          const student = await SiakadApi.getStudentByNim(cleanId);
-          if (student && String(student.nim).trim().toLowerCase() === cleanId.toLowerCase()) {
-            if (cleanPassword !== 'password123' && cleanPassword !== String(student.nim).trim()) {
-              throw new Error('Kata sandi yang Anda masukkan salah.');
-            }
-            const cleanName = student.nama.replace(/^Mahasiswa\s*\((.*?)\)$/i, '$1').replace(/^\(Mahasiswa\)\s*/i, '').trim();
-            const user = {
-              role: 'mahasiswa',
-              nim: student.nim,
-              nama: cleanName,
-              email: student.email || `${student.nim}@upi.edu`,
-              prodi: student.prodi,
-              currentSemester: student.currentSemester || student.semesterAktif || 1,
-              totalSksLulus: student.totalSksLulus || 0,
-              ipk: student.ipk || 0.00,
-              statusSpp: student.statusSpp || 'Lunas',
-              avatarLabel: cleanName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
-              authToken: `SILADIK-MHS-${student.nim}-${Date.now()}`
-            };
-            setCurrentUser(user);
-            return user;
-          }
-        } catch (e) {
-          if (e.message && e.message.includes('Kata sandi')) throw e;
-        }
-      }
-
-      throw new Error('NIM / NIP / ID Pengguna tidak ditemukan dalam sistem database.');
+      throw new Error('Nomor Induk Mahasiswa (NIM) atau akun tidak terdaftar dalam pangkalan data akademik SILADIK UPI.');
     },
 
     // RBAC Security Check

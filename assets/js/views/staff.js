@@ -8,6 +8,8 @@
 const StaffView = (() => {
   let activeFilter = 'all';
   let mobileViewMode = 'card'; // 'card' (default mobile) atau 'table' (bisa di-slide)
+  let workflowPrinted = false;
+  let workflowUploaded = false;
 
   function toggleMobileViewMode() {
     mobileViewMode = mobileViewMode === 'card' ? 'table' : 'card';
@@ -77,7 +79,7 @@ const StaffView = (() => {
             </div>
           </div>
           <div class="stat-value">${allRequests.filter(r => r.status === 'verifikasi_staf').length}</div>
-          <div class="stat-meta positive">Penyusunan auto-fill otomatis SIAKAD</div>
+          <div class="stat-meta positive">Penyusunan otomatis pangkalan data akademik</div>
         </div>
 
         <div class="stat-card">
@@ -88,7 +90,7 @@ const StaffView = (() => {
             </div>
           </div>
           <div class="stat-value">${completedToday.length}</div>
-          <div class="stat-meta positive">Telah memuat TTD & Cap Digital</div>
+          <div class="stat-meta positive">Telah melalui verifikasi & pengesahan resmi</div>
         </div>
 
         <div class="stat-card">
@@ -315,9 +317,79 @@ const StaffView = (() => {
   /**
    * Open Staf Review & One-Click Execution Modal
    */
+  function updateWorkflowStatus() {
+    const chk = document.getElementById('chkPhysicalVerification');
+    const isStep2Done = workflowUploaded || (chk && chk.checked);
+    const btn = document.getElementById('btnSahkanDokumen');
+    const hint = document.getElementById('workflowInstructionHint');
+    const step1Badge = document.getElementById('step1Badge');
+    const step2Badge = document.getElementById('step2Badge');
+
+    if (step1Badge) {
+      if (workflowPrinted) {
+        step1Badge.style.background = '#ecfdf5';
+        step1Badge.style.color = '#065f46';
+        step1Badge.innerText = '✓ Selesai';
+      } else {
+        step1Badge.style.background = '#fef3c7';
+        step1Badge.style.color = '#92400e';
+        step1Badge.innerText = 'Wajib Cetak/Unduh';
+      }
+    }
+
+    if (step2Badge) {
+      if (isStep2Done) {
+        step2Badge.style.background = '#ecfdf5';
+        step2Badge.style.color = '#065f46';
+        step2Badge.innerText = '✓ Terverifikasi';
+      } else {
+        step2Badge.style.background = '#fee2e2';
+        step2Badge.style.color = '#991b1b';
+        step2Badge.innerText = 'Wajib Dilengkapi';
+      }
+    }
+
+    if (!btn) return;
+
+    if (workflowPrinted && isStep2Done) {
+      btn.disabled = false;
+      btn.className = 'btn btn-success btn-block btn-lg';
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+      if (hint) {
+        hint.style.color = '#059669';
+        hint.innerHTML = '✓ Seluruh alur SOP terpenuhi. Dokumen siap disahkan dan diterbitkan.';
+      }
+    } else {
+      btn.disabled = true;
+      btn.className = 'btn btn-secondary btn-block btn-lg';
+      btn.style.opacity = '0.6';
+      btn.style.cursor = 'not-allowed';
+      if (hint) {
+        hint.style.color = '#dc2626';
+        const missing = [];
+        if (!workflowPrinted) missing.push('Tahap 1 (Cetak/Unduh Draf)');
+        if (!isStep2Done) missing.push('Tahap 2 (Unggah Scan / Centang Konfirmasi Fisik)');
+        hint.innerHTML = `🔒 Selesaikan alur terlebih dahulu: ${missing.join(' dan ')}.`;
+      }
+    }
+  }
+
+  function toggleVerificationCheck(isChecked) {
+    updateWorkflowStatus();
+  }
+
+  function markStep1Completed() {
+    workflowPrinted = true;
+    updateWorkflowStatus();
+  }
+
   async function openProcessModal(reqId) {
     const req = QueueSlaManager.getRequestById(reqId);
     if (!req) return;
+
+    workflowPrinted = false;
+    workflowUploaded = !!(req.uploadedSignedFile);
 
     const student = await SiakadApi.getStudentByNim(req.nim);
     const modalTitle = `Verifikasi & Eksekusi: ${req.queueNo} - ${req.docTitle}`;
@@ -332,10 +404,10 @@ const StaffView = (() => {
               Data Akademik Mahasiswa
             </div>
             <div style="font-size: 0.85rem; line-height: 1.45;">
-              <div><strong>${student.nama}</strong></div>
-              <div>NIM: ${student.nim}</div>
-              <div>Prodi: ${student.prodi}</div>
-              <div>Semester Berjalan: Semester ${student.semesterAktif}</div>
+              <div><strong>${student ? student.nama : req.nama}</strong></div>
+              <div>NIM: ${req.nim}</div>
+              <div>Prodi: ${student ? student.prodi : (req.prodi || 'S1 Bisnis Digital')}</div>
+              <div>Semester Berjalan: Semester ${student ? student.semesterAktif : (req.semester || 1)}</div>
               <div style="margin-top: 0.35rem; color: #059669; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
                 <span class="live-status-dot"></span> Status Akademik: Aktif Terdaftar
               </div>
@@ -343,10 +415,13 @@ const StaffView = (() => {
           </div>
 
           <!-- TAHAP 1: Cetak Draf Fisik -->
-          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.9rem; margin-bottom: 1rem;">
-            <div style="font-size: 0.775rem; font-weight: 800; color: #1e293b; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.45rem;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-              <span>TAHAP 1: Cetak Draf Kosongan Fisik</span>
+          <div id="step1Box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: var(--radius-md); padding: 0.9rem; margin-bottom: 1rem;">
+            <div style="font-size: 0.775rem; font-weight: 800; color: #1e293b; margin-bottom: 0.35rem; display: flex; align-items: center; justify-content: space-between;">
+              <span style="display: flex; align-items: center; gap: 0.45rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>TAHAP 1: Cetak Draf Fisik (Wajib)</span>
+              </span>
+              <span id="step1Badge" class="badge" style="background: #fef3c7; color: #92400e; font-size: 0.68rem; font-weight: 700;">Wajib Cetak/Unduh</span>
             </div>
             <p style="font-size: 0.725rem; color: #64748b; line-height: 1.4; margin-bottom: 0.6rem;">
               Cetak draf dokumen untuk dimintakan paraf pejabat dan tanda tangan basah pimpinan (KASI) serta cap stempel basah universitas.
@@ -368,13 +443,16 @@ const StaffView = (() => {
           </div>
 
           <!-- TAHAP 2: Unggah Hasil Scan Dokumen Sah -->
-          <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.9rem; margin-bottom: 1rem;">
-            <div style="font-size: 0.775rem; font-weight: 800; color: #1e40af; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.45rem;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-              <span>TAHAP 2: Unggah Dokumen Sah (TTD Basah)</span>
+          <div id="step2Box" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.9rem; margin-bottom: 1rem;">
+            <div style="font-size: 0.775rem; font-weight: 800; color: #1e40af; margin-bottom: 0.35rem; display: flex; align-items: center; justify-content: space-between;">
+              <span style="display: flex; align-items: center; gap: 0.45rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>TAHAP 2: Pengesahan & Scan Fisik (Wajib)</span>
+              </span>
+              <span id="step2Badge" class="badge" style="background: #fee2e2; color: #991b1b; font-size: 0.68rem; font-weight: 700;">Wajib Dilengkapi</span>
             </div>
             <p style="font-size: 0.725rem; color: #475569; line-height: 1.4; margin-bottom: 0.6rem;">
-              Unggah file hasil scan berkas fisik yang telah ditandatangani basah dan dicap stempel.
+              Unggah file hasil scan berkas fisik yang telah ditandatangani basah dan dicap stempel, atau konfirmasi checklist keabsahan fisik di bawah.
             </p>
             <input
               type="file"
@@ -383,29 +461,38 @@ const StaffView = (() => {
               accept="image/*,application/pdf"
               onchange="StaffView.handleScanUpload(event, '${req.id}')" />
 
-            <div id="uploadStatusBadge" style="margin-top: 0.5rem; font-size: 0.725rem; color: ${req.uploadedSignedFile ? '#059669' : '#d97706'}; font-weight: 600; display:flex; align-items:center; gap:0.35rem;">
+            <div id="uploadStatusBadge" style="margin-top: 0.5rem; font-size: 0.725rem; color: ${req.uploadedSignedFile ? '#059669' : '#64748b'}; font-weight: 600; display:flex; align-items:center; gap:0.35rem;">
               ${req.uploadedSignedFile ? `
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span>Berkas Fisik Terunggah: <strong>${req.uploadedSignedFile}</strong></span>
               ` : `
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                <span>Belum ada scan dokumen basah yang dipilih (Opsional).</span>
+                <span>Belum ada scan dokumen basah yang dipilih.</span>
               `}
+            </div>
+
+            <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed #cbd5e1;">
+              <label style="font-size: 0.74rem; color: #1e293b; display: flex; align-items: flex-start; gap: 0.45rem; cursor: pointer; user-select: none;">
+                <input type="checkbox" id="chkPhysicalVerification" onchange="StaffView.toggleVerificationCheck(this.checked)" style="margin-top: 2px;">
+                <span><strong>Konfirmasi Fisik:</strong> Saya telah memeriksa keabsahan draf fisik dan memastikan berkas sah bertanda tangan basah pimpinan.</span>
+              </label>
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="staffNotesInput">Catatan Staf / Nomor Arsip TU</label>
+            <label class="form-label" for="staffNotesInput">Catatan Staf / Nomor Arsip Layanan</label>
             <textarea id="staffNotesInput" class="form-control" rows="2" placeholder="Catatan verifikasi atau nomor arsip fisik...">${req.processedBy || ''}</textarea>
           </div>
 
           <!-- Actions -->
-          <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem;">
-            <button class="btn btn-success btn-block btn-lg" style="display:flex; align-items:center; justify-content:center; gap:0.5rem;" onclick="StaffView.executeApproval('${req.id}')">
+          <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
+            <button id="btnSahkanDokumen" class="btn btn-secondary btn-block btn-lg" style="opacity: 0.6; cursor: not-allowed; display:flex; align-items:center; justify-content:center; gap:0.5rem;" disabled onclick="StaffView.executeApproval('${req.id}')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
               <span>Sahkan & Terbitkan ke Mahasiswa</span>
             </button>
-            <button class="btn btn-danger btn-block btn-sm" style="display:flex; align-items:center; justify-content:center; gap:0.4rem;" onclick="StaffView.executeRejection('${req.id}')">
+            <div id="workflowInstructionHint" style="font-size:0.75rem; color:#dc2626; text-align:center; font-weight:600;">
+              🔒 Tombol terkunci. Selesaikan Tahap 1 (Cetak/Unduh) dan Tahap 2 (Unggah/Konfirmasi) terlebih dahulu.
+            </div>
+            <button class="btn btn-danger btn-block btn-sm" style="display:flex; align-items:center; justify-content:center; gap:0.4rem; margin-top:0.25rem;" onclick="StaffView.executeRejection('${req.id}')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
               <span>Tolak / Kembalikan Pengajuan</span>
             </button>
@@ -442,9 +529,9 @@ const StaffView = (() => {
     previewContainer.innerHTML = `
       <div style="text-align: center; padding: 4rem 1rem;">
         <div class="ai-spinner"></div>
-        <h4 style="color: #7c3aed; font-size: 1.1rem; margin-bottom: 0.35rem;">Sistem Sedang Memetakan Data SIAKAD...</h4>
+        <h4 style="color: #7c3aed; font-size: 1.1rem; margin-bottom: 0.35rem;">Sistem Sedang Memproses Data Akademik...</h4>
         <p style="font-size: 0.85rem; color: var(--text-muted);">
-          Menyusun draf resmi kosongan dari SIAKAD, siap diunduh dan dicetak untuk tanda tangan basah pimpinan.
+          Menyusun draf dokumen resmi SILADIK, siap diunduh dan dicetak untuk pengesahan tanda tangan basah pimpinan.
         </p>
       </div>
     `;
@@ -474,12 +561,23 @@ const StaffView = (() => {
   }
 
   async function executeApproval(reqId) {
+    const chk = document.getElementById('chkPhysicalVerification');
+    const isStep2Done = workflowUploaded || (chk && chk.checked);
+
+    if (!workflowPrinted || !isStep2Done) {
+      const missing = [];
+      if (!workflowPrinted) missing.push('Tahap 1 (Cetak/Unduh Draf Fisik)');
+      if (!isStep2Done) missing.push('Tahap 2 (Unggah Scan / Centang Konfirmasi Keabsahan Fisik)');
+      App.showToast(`Alur belum lengkap: Harap selesaikan ${missing.join(' dan ')} terlebih dahulu!`, 'warning');
+      return;
+    }
+
     const user = AuthManager.getCurrentUser() || { nama: 'Staf TU Akademik' };
     const staffName = `${user.nama} (Staf TU Akademik)`;
     const staffNip = user.nomor_induk || user.nip || '';
 
     // Cegah klik ganda selama proses berjalan
-    const btn = document.querySelector(`button[onclick="StaffView.executeApproval('${reqId}')"]`);
+    const btn = document.getElementById('btnSahkanDokumen') || document.querySelector(`button[onclick="StaffView.executeApproval('${reqId}')"]`);
     if (btn) {
       btn.disabled = true;
       btn.innerHTML = '<span>Memproses...</span>';
@@ -541,13 +639,15 @@ const StaffView = (() => {
   function printModalDoc() {
     const previewContainer = document.getElementById('modalDocPreviewContainer');
     if (!previewContainer || !previewContainer.innerHTML.trim()) {
-      App.showToast('Tidak ada dokumen untuk dicetak. Silakan generate draf terlebih dahulu.', 'warning');
+      App.showToast('Tidak ada dokumen untuk dicetak. Silakan susun draf dokumen terlebih dahulu.', 'warning');
       return;
     }
+    markStep1Completed();
     App.printDocument(previewContainer.innerHTML, 'Dokumen Draf Fisik UPI Tasikmalaya');
   }
 
   async function downloadDraftDoc(reqId) {
+    markStep1Completed();
     const req = QueueSlaManager.getRequestById(reqId);
     const docCode = req ? req.id : 'UPI';
 
@@ -639,6 +739,8 @@ const StaffView = (() => {
         `;
       }
 
+      workflowUploaded = true;
+      updateWorkflowStatus();
       App.showToast(`Berkas fisik scan "${file.name}" berhasil dilampirkan!`, 'success');
     };
     reader.readAsDataURL(file);
@@ -655,7 +757,8 @@ const StaffView = (() => {
     printModalDoc,
     downloadPdf: downloadDraftDoc,
     downloadDraftDoc,
-    handleScanUpload
+    handleScanUpload,
+    toggleVerificationCheck
   };
 })();
 

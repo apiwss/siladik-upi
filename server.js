@@ -303,8 +303,8 @@ app.post('/api/auth/register', async (req, res) => {
       INSERT INTO mahasiswa_profile (
         user_id, nim, semester_berjalan, angkatan, dosen_pa,
         total_sks_lulus, ipk
-      ) VALUES ($1, $2, $3, $4, 'Muhammad Rizki Nugraha, S.Pd., M.T.', $5, 3.75)
-    `, [newUserId, nim.trim(), sem, angkatan, (sem - 1) * 20]);
+      ) VALUES ($1, $2, $3, $4, 'Muhammad Rizki Nugraha, S.Pd., M.T.', 0, NULL)
+    `, [newUserId, nim.trim(), sem, angkatan]);
 
     await client.query(`
       INSERT INTO status_spp (user_id, semester, tahun_akademik, status, tanggal_bayar, jumlah_bayar)
@@ -325,8 +325,8 @@ app.post('/api/auth/register', async (req, res) => {
         prodi: prodi || 'S1 Bisnis Digital',
         currentSemester: sem,
         semesterAktif: sem,
-        totalSksLulus: (sem - 1) * 20,
-        ipk: 3.75,
+        totalSksLulus: 0,
+        ipk: null,
         statusSpp: 'Lunas',
         email: cleanNameEmail
       }
@@ -909,7 +909,7 @@ app.post('/api/admin/users', async (req, res) => {
         parseInt(angkatan || 2024, 10),
         dosen_pa || 'Muhammad Rizki Nugraha, S.Pd., M.T.',
         parseInt(total_sks_lulus || 0, 10),
-        parseFloat(ipk || 0.00)
+        (ipk !== undefined && ipk !== null && ipk !== '' && !isNaN(Number(ipk)) && Number(ipk) > 0) ? parseFloat(ipk) : null
       ]);
 
       const sppState = (status_spp || 'LUNAS').toUpperCase() === 'LUNAS' ? 'LUNAS' : 'BELUM_LUNAS';
@@ -999,7 +999,7 @@ app.put('/api/admin/users/:id', async (req, res) => {
         parseInt(angkatan || 2024, 10),
         dosen_pa || 'Muhammad Rizki Nugraha, S.Pd., M.T.',
         parseInt(total_sks_lulus || 0, 10),
-        parseFloat(ipk || 0.00)
+        (ipk !== undefined && ipk !== null && ipk !== '' && !isNaN(Number(ipk)) && Number(ipk) > 0) ? parseFloat(ipk) : null
       ]);
 
       if (status_spp) {

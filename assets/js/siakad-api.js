@@ -118,7 +118,7 @@ const SiakadApi = {
           prodi: foundReg.prodi || 'S1 Bisnis Digital',
           currentSemester: foundReg.currentSemester || foundReg.semesterAktif || 1,
           totalSksLulus: foundReg.totalSksLulus || 0,
-          ipk: foundReg.ipk !== undefined ? Number(foundReg.ipk) : 3.75,
+          ipk: (foundReg.ipk !== undefined && foundReg.ipk !== null && foundReg.ipk !== '' && !isNaN(Number(foundReg.ipk)) && Number(foundReg.ipk) > 0) ? Number(foundReg.ipk) : null,
           statusSpp: foundReg.statusSpp || 'Lunas',
           dosen_pa: foundReg.dosen_pa || 'Muhammad Rizki Nugraha, S.Pd., M.T.',
           riwayatSemester: foundReg.riwayatSemester || {}
@@ -147,7 +147,7 @@ const SiakadApi = {
               prodi: foundAdmin.prodi || 'S1 Bisnis Digital',
               currentSemester: foundAdmin.semester_berjalan || foundAdmin.currentSemester || 1,
               totalSksLulus: foundAdmin.total_sks_lulus || 0,
-              ipk: foundAdmin.ipk !== undefined ? Number(foundAdmin.ipk) : 3.75,
+              ipk: (foundAdmin.ipk !== undefined && foundAdmin.ipk !== null && foundAdmin.ipk !== '' && !isNaN(Number(foundAdmin.ipk)) && Number(foundAdmin.ipk) > 0) ? Number(foundAdmin.ipk) : null,
               statusSpp: foundAdmin.spp_status ? (foundAdmin.spp_status.toUpperCase() === 'LUNAS' ? 'Lunas' : 'Belum Lunas') : 'Lunas',
               dosen_pa: foundAdmin.dosen_pa || 'Muhammad Rizki Nugraha, S.Pd., M.T.',
               riwayatSemester: {}
@@ -178,7 +178,7 @@ const SiakadApi = {
               prodi: foundReq.prodi || 'S1 Bisnis Digital',
               currentSemester: foundReq.semester || 1,
               totalSksLulus: 0,
-              ipk: 3.75,
+              ipk: null,
               statusSpp: foundReq.sppStatus || 'Lunas',
               dosen_pa: 'Muhammad Rizki Nugraha, S.Pd., M.T.',
               riwayatSemester: {}
@@ -271,23 +271,8 @@ const SiakadApi = {
       return this.enrichStudent(this.databaseSiakad['2312017']);
     }
 
-    // 9. Fallback cerdas tanpa pernah menyematkan prefix 'Mahasiswa (...)'
-    const isPureDigits = /^\d+$/.test(cleanNim);
-    const resolvedNama = isPureDigits ? cleanNim : cleanNim;
-    const resolvedNim = isPureDigits ? cleanNim : '2312088';
-
-    const fallbackGeneric = {
-      nim: resolvedNim,
-      nama: this.sanitizeStudentName(resolvedNama, cleanNim),
-      prodi: 'S1 Bisnis Digital',
-      currentSemester: 1,
-      totalSksLulus: 0,
-      ipk: 3.75,
-      statusSpp: 'Lunas',
-      dosen_pa: 'Muhammad Rizki Nugraha, S.Pd., M.T.',
-      riwayatSemester: {}
-    };
-    return this.enrichStudent(fallbackGeneric);
+    // 9. Jika tidak ditemukan dalam pangkalan data, kembalikan null (Strict Verification - Anti-Bypass)
+    return null;
   },
 
   async getStudentByNim(nim) {
@@ -414,7 +399,7 @@ const SiakadApi = {
     const mkList = kurikulumMaster[sem] || kurikulumMaster[1];
     const totalSks = mkList.reduce((s, c) => s + c.sks, 0);
     const totalMutu = mkList.reduce((s, c) => s + c.sks * this.gradePoint(c.nilai), 0);
-    const ipSemester = totalSks ? Number((totalMutu / totalSks).toFixed(2)) : 3.75;
+    const ipSemester = totalSks ? Number((totalMutu / totalSks).toFixed(2)) : null;
 
     return {
       semesterTeks: `Semester ${sem} (${periode} ${tahunAkademik})`,
@@ -426,16 +411,7 @@ const SiakadApi = {
   async getAkademikDataBySemester(nim, semesterTarget) {
     let mhs = await this.getMahasiswaByNim(nim);
     if (!mhs) {
-      const cleanInput = String(nim || '').trim();
-      const isNum = /^\d+$/.test(cleanInput);
-      mhs = {
-        nim: isNum ? cleanInput : '2312088',
-        nama: this.sanitizeStudentName(cleanInput, 'Mahasiswa UPI'),
-        prodi: 'S1 Bisnis Digital',
-        currentSemester: 1,
-        statusSpp: 'Lunas',
-        riwayatSemester: {}
-      };
+      return null;
     }
     const target = Number(semesterTarget) || 1;
     let semesterData = mhs.riwayatSemester?.[target];

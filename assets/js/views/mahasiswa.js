@@ -101,7 +101,7 @@ const MahasiswaView = (() => {
           <div class="data-cell">
             <span class="data-cell-label">Indeks Prestasi Kumulatif (IPK)</span>
             <span class="data-cell-value">
-              ${student.ipk ?? '-'} ${student.totalSksLulus ? `(${student.totalSksLulus} SKS)` : ''}
+              ${(student.ipk !== null && student.ipk !== undefined && student.ipk !== '' && Number(student.ipk) > 0) ? student.ipk : '<em style="color:#94a3b8; font-weight:normal;">Belum ada data</em>'} ${student.totalSksLulus ? `(${student.totalSksLulus} SKS)` : ''}
             </span>
           </div>
 
@@ -257,8 +257,7 @@ const MahasiswaView = (() => {
                 <button
                   type="submit"
                   id="btnSubmitPengajuan"
-                  class="btn btn-primary btn-block btn-lg"
-                  onclick="MahasiswaView.handleSubmit(event)">
+                  class="btn btn-primary btn-block btn-lg">
 
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="22" y1="2" x2="11" y2="13"/>
@@ -777,17 +776,23 @@ const MahasiswaView = (() => {
     }
   }
 
+  let _isSubmitting = false;
+
   async function handleSubmit(e) {
     if (e) {
       if (typeof e.preventDefault === 'function') e.preventDefault();
       if (typeof e.stopPropagation === 'function') e.stopPropagation();
     }
 
+    if (_isSubmitting) return;
+    _isSubmitting = true;
+
     const user = AuthManager.getCurrentUser();
     const nim = user?.nim || user?.nomor_induk;
 
     if (!nim) {
       App.showToast('Gagal memverifikasi identitas mahasiswa. Silakan masuk ulang.', 'error');
+      _isSubmitting = false;
       return;
     }
 
@@ -859,6 +864,7 @@ const MahasiswaView = (() => {
         'error'
       );
     } finally {
+      _isSubmitting = false;
       const btn = document.getElementById('btnSubmitPengajuan');
       if (btn) {
         btn.disabled = false;
@@ -1092,7 +1098,7 @@ const MahasiswaView = (() => {
                 <span class="timeline-step-title">Tahap 2: Review Staf TU & Cetak Draf Fisik</span>
                 <span class="timeline-step-badge ${s2Badge}">${s2BadgeText}</span>
               </div>
-              <div class="timeline-step-desc">Staf Tata Usaha Akademik memverifikasi keabsahan data SIAKAD, riwayat SPP, dan mencetak lembar draf fisik dokumen tanpa tanda tangan untuk verifikasi manual.</div>
+              <div class="timeline-step-desc">Staf Tata Usaha Akademik memverifikasi keabsahan data akademik, status pembayaran SPP, dan mencetak lembar draf fisik dokumen untuk pengesahan pimpinan.</div>
               <div class="timeline-step-actor">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 Unit Tata Usaha Akademik Kampus Tasikmalaya
