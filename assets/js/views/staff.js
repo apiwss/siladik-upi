@@ -427,13 +427,17 @@ const StaffView = (() => {
               Cetak draf dokumen untuk dimintakan paraf pejabat dan tanda tangan basah pimpinan (KASI) serta cap stempel basah universitas.
             </p>
             <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
-              <button class="btn btn-secondary btn-sm" style="flex:1; min-width:100px; display:inline-flex; align-items:center; justify-content:center; gap:0.35rem;" onclick="StaffView.printModalDoc()" title="Buka dialog cetak dokumen / Simpan sebagai PDF">
+              <button class="btn btn-secondary btn-sm" style="flex:1; min-width:95px; display:inline-flex; align-items:center; justify-content:center; gap:0.35rem;" onclick="StaffView.printModalDoc()" title="Buka dialog cetak dokumen / Simpan sebagai PDF">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                <span>Cetak Dokumen</span>
+                <span>Cetak</span>
               </button>
-              <button class="btn btn-primary btn-sm" style="flex:1; min-width:110px; display:inline-flex; align-items:center; justify-content:center; gap:0.35rem;" onclick="StaffView.downloadPdf('${req.id}')" title="Unduh berkas dokumen PDF">
+              <button class="btn btn-primary btn-sm" style="flex:1; min-width:105px; display:inline-flex; align-items:center; justify-content:center; gap:0.35rem;" onclick="StaffView.downloadPdf('${req.id}')" title="Unduh berkas dokumen PDF">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 <span>Unduh PDF</span>
+              </button>
+              <button class="btn btn-secondary btn-sm" style="flex:1; min-width:110px; display:inline-flex; align-items:center; justify-content:center; gap:0.35rem; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;" onclick="StaffView.downloadWord('${req.id}')" title="Unduh draf dokumen format Microsoft Word (.doc)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Unduh Word</span>
               </button>
               <button id="btnTriggerAi" class="btn btn-sm btn-outline" style="display:inline-flex; align-items:center; gap:0.3rem;" onclick="StaffView.generateAiDraftInModal('${req.id}')" title="Perbarui Isi Draf">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -700,6 +704,51 @@ const StaffView = (() => {
     }
   }
 
+  function downloadWord(reqId) {
+    markStep1Completed();
+    const req = QueueSlaManager.getRequestById(reqId);
+    const docCode = req ? req.id : 'UPI';
+    const previewContainer = document.getElementById('modalDocPreviewContainer');
+    if (!previewContainer || !previewContainer.innerHTML.trim()) {
+      App.showToast('Silakan tunggu draf dokumen selesai dimuat.', 'warning');
+      return;
+    }
+
+    const header = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+            xmlns:w='urn:schemas-microsoft-com:office:word' 
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset='utf-8'>
+        <title>Draf Dokumen Resmi SILADIK UPI</title>
+        <style>
+          body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.45; color: #000000; }
+          table { border-collapse: collapse; width: 100%; margin-bottom: 12pt; }
+          th, td { padding: 4pt 6pt; font-size: 11pt; }
+          .official-table th, .official-table td { border: 1px solid #000000; }
+          .kop-surat { text-align: center; border-bottom: 2px solid #000000; margin-bottom: 14pt; padding-bottom: 6pt; }
+          .doc-heading { text-align: center; font-weight: bold; font-size: 13pt; margin-bottom: 12pt; text-decoration: underline; }
+          .doc-paragraph { text-align: justify; text-indent: 28pt; margin-bottom: 8pt; }
+          .doc-identity-table td { padding: 2pt 4pt; }
+          .ttd-box { margin-top: 18pt; }
+        </style>
+      </head>
+      <body>
+    `;
+    const footer = "</body></html>";
+    const sourceHtml = header + previewContainer.innerHTML + footer;
+    const blob = new Blob(['\ufeff', sourceHtml], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `DRAF_DOKUMEN_${docCode}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    App.showToast('Draf dokumen format Microsoft Word (.doc) berhasil diunduh!', 'success');
+  }
+
   function handleScanUpload(event, reqId) {
     const file = event.target.files?.[0];
     const statusBadge = document.getElementById('uploadStatusBadge');
@@ -756,6 +805,7 @@ const StaffView = (() => {
     executeRejection,
     printModalDoc,
     downloadPdf: downloadDraftDoc,
+    downloadWord,
     downloadDraftDoc,
     handleScanUpload,
     toggleVerificationCheck

@@ -101,15 +101,14 @@ const MahasiswaView = (() => {
           <div class="data-cell">
             <span class="data-cell-label">Indeks Prestasi Kumulatif (IPK)</span>
             <span class="data-cell-value">
-              ${(student.ipk !== null && student.ipk !== undefined && student.ipk !== '' && Number(student.ipk) > 0) ? student.ipk : '<em style="color:#94a3b8; font-weight:normal;">Belum ada data</em>'} ${student.totalSksLulus ? `(${student.totalSksLulus} SKS)` : ''}
+              ${(student.ipk !== null && student.ipk !== undefined && student.ipk !== '' && Number(student.ipk) > 0) ? student.ipk : '<em style="color:#94a3b8; font-weight:normal;">Belum ada data</em>'}
             </span>
           </div>
 
           <div class="data-cell">
-            <span class="data-cell-label">Status SPP</span>
-            <span class="data-cell-value" style="color: #4ade80; display: inline-flex; align-items: center; gap: 0.35rem;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              ${student.statusSpp || 'LUNAS'}
+            <span class="data-cell-label">Total SKS Lulus</span>
+            <span class="data-cell-value">
+              ${student.totalSksLulus || 0} SKS
             </span>
           </div>
 
@@ -1098,7 +1097,7 @@ const MahasiswaView = (() => {
                 <span class="timeline-step-title">Tahap 2: Review Staf TU & Cetak Draf Fisik</span>
                 <span class="timeline-step-badge ${s2Badge}">${s2BadgeText}</span>
               </div>
-              <div class="timeline-step-desc">Staf Tata Usaha Akademik memverifikasi keabsahan data akademik, status pembayaran SPP, dan mencetak lembar draf fisik dokumen untuk pengesahan pimpinan.</div>
+              <div class="timeline-step-desc">Staf Tata Usaha Akademik memverifikasi keabsahan pangkalan data akademik dan mencetak lembar draf fisik dokumen untuk pengesahan pimpinan.</div>
               <div class="timeline-step-actor">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 Unit Tata Usaha Akademik Kampus Tasikmalaya

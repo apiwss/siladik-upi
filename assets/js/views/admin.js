@@ -741,10 +741,7 @@ const AdminView = (() => {
                       ${u.role === 'MAHASISWA' ? `
                         <div class="academic-mini-detail">
                           <span>Sem. <strong>${u.semester_berjalan || 1}</strong></span> • 
-                          <span>IPK: <strong>${(u.ipk !== null && u.ipk !== undefined && u.ipk !== '' && Number(u.ipk) > 0) ? u.ipk : '<em style="color:var(--text-subtle);">Belum ada data</em>'}</strong></span> • 
-                          <span class="spp-pill ${u.spp_status === 'LUNAS' ? 'lunas' : 'belum'}">
-                            ${u.spp_status === 'LUNAS' ? 'SPP Lunas' : 'SPP Belum'}
-                          </span>
+                          <span>IPK: <strong>${(u.ipk !== null && u.ipk !== undefined && u.ipk !== '' && Number(u.ipk) > 0) ? u.ipk : '<em style="color:var(--text-subtle);">Belum ada data</em>'}</strong></span>
                         </div>
                       ` : `<span style="color:var(--text-subtle); font-size:0.8rem;">Pegawai UPI</span>`}
                     </td>
@@ -1226,19 +1223,9 @@ const AdminView = (() => {
             </div>
           </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label" for="newSks">Total SKS Lulus</label>
-              <input type="number" id="newSks" class="form-control" min="0" max="160" value="0" />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="newSpp">Status Pembayaran SPP</label>
-              <select id="newSpp" class="form-control">
-                <option value="LUNAS">LUNAS (Dapat Mengajukan Dokumen)</option>
-                <option value="BELUM_LUNAS">BELUM LUNAS (Terblokir)</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label class="form-label" for="newSks">Total SKS Lulus</label>
+            <input type="number" id="newSks" class="form-control" min="0" max="160" value="0" />
           </div>
 
           <div class="form-group">
@@ -1427,19 +1414,9 @@ const AdminView = (() => {
             </div>
           </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label" for="editSks">Total SKS Lulus</label>
-              <input type="number" id="editSks" class="form-control" value="${user.total_sks_lulus || 0}" />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="editSpp">Status Pembayaran SPP</label>
-              <select id="editSpp" class="form-control">
-                <option value="LUNAS" ${user.spp_status === 'LUNAS' ? 'selected' : ''}>LUNAS (Bisa Mengajukan)</option>
-                <option value="BELUM_LUNAS" ${user.spp_status !== 'LUNAS' ? 'selected' : ''}>BELUM LUNAS (Terblokir)</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label class="form-label" for="editSks">Total SKS Lulus</label>
+            <input type="number" id="editSks" class="form-control" value="${user.total_sks_lulus || 0}" />
           </div>
 
           <div class="form-group">
@@ -1491,7 +1468,7 @@ const AdminView = (() => {
       const editIpkVal = editIpkEl ? editIpkEl.value.trim() : '';
       body.ipk = (editIpkVal !== '' && !isNaN(Number(editIpkVal)) && Number(editIpkVal) > 0) ? parseFloat(editIpkVal) : null;
       body.total_sks_lulus = parseInt(document.getElementById('editSks').value, 10) || 0;
-      body.status_spp = document.getElementById('editSpp').value;
+      body.status_spp = (document.getElementById('editSpp') && document.getElementById('editSpp').value) || 'LUNAS';
       body.dosen_pa = document.getElementById('editDosenPa').value.trim();
     }
 
@@ -3158,13 +3135,12 @@ const AdminView = (() => {
                 <th>Program Studi</th>
                 <th>Semester Berjalan</th>
                 <th>Status Akademik</th>
-                <th>Status Pembayaran</th>
                 <th style="text-align:right;">Aksi</th>
               </tr>
             </thead>
             <tbody>
               ${allStudents.length === 0 ? `
-                <tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--text-muted);">Belum ada data mahasiswa.</td></tr>
+                <tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--text-muted);">Belum ada data mahasiswa.</td></tr>
               ` : allStudents.map((m, idx) => {
                 const isCuti = getStudentCutiStatus(m.nomor_induk) || m.status_akademik === 'CUTI';
                 const isNonaktif = (m.is_active === false || m.status_akademik === 'NON-AKTIF' || m.status_akademik === 'NONAKTIF');
@@ -3221,12 +3197,6 @@ const AdminView = (() => {
                         `;
                       }
                     })()}
-                  </td>
-                  <td>
-                    <span class="status-chip ${m.spp_status === 'LUNAS' ? 'active' : 'inactive'}">
-                      <span class="status-indicator ${m.spp_status === 'LUNAS' ? 'active' : 'inactive'}"></span>
-                      ${m.spp_status || 'LUNAS'}
-                    </span>
                   </td>
                   <td style="text-align:right;">
                     <div class="action-btn-group" style="justify-content: flex-end;">

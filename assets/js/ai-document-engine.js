@@ -172,12 +172,7 @@ const AiDocumentEngine = (() => {
           <tr>
             <td class="label-col">Status Keaktifan</td>
             <td class="colon-col">:</td>
-            <td><strong style="color: #047857;">${(student.statusAkademik || 'Aktif').toUpperCase()} (Terdaftar pada PDDikti & SIAKAD)</strong></td>
-          </tr>
-          <tr>
-            <td class="label-col">Status SPP/UKT</td>
-            <td class="colon-col">:</td>
-            <td>${student.sppStatus || 'Lunas'} (${student.sppNominal || 'Rp 3.500.000'})</td>
+            <td><strong style="color: #047857;">${(student.statusAkademik || 'Aktif').toUpperCase()} (Terdaftar pada PDDikti & Pangkalan Data UPI)</strong></td>
           </tr>
         </table>
 
@@ -405,9 +400,9 @@ const AiDocumentEngine = (() => {
             <td class="label-col">Program Studi</td>
             <td class="colon-col">:</td>
             <td>${student.prodi || 'S1 Bisnis Digital'}</td>
-            <td class="label-col">Status Keuangan SPP</td>
+            <td class="label-col">Status Akademik</td>
             <td class="colon-col">:</td>
-            <td><strong style="color: #047857;">Lunas (Tervalidasi Otomatis)</strong></td>
+            <td><strong style="color: #047857;">${(student.statusAkademik || 'Aktif').toUpperCase()}</strong></td>
           </tr>
         </table>
       `;
