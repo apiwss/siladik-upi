@@ -714,30 +714,192 @@ const StaffView = (() => {
       return;
     }
 
-    const header = `
+    // Buat salinan DOM agar tidak mengubah tampilan preview aktif di modal
+    const clone = previewContainer.cloneNode(true);
+
+    // 1. Transform Kop Surat menjadi Tabel 2-Kolom Khusus Word (Logo kiri, teks tengah)
+    const kopList = clone.querySelectorAll('.kop-surat');
+    kopList.forEach(kop => {
+      const kopText = kop.querySelector('.kop-text');
+      const table = document.createElement('table');
+      table.setAttribute('border', '0');
+      table.setAttribute('cellpadding', '0');
+      table.setAttribute('cellspacing', '0');
+      table.setAttribute('style', 'width: 100%; border-collapse: collapse; border: none !important; border-bottom: 2.5pt double #000000; margin-bottom: 14pt; padding-bottom: 6pt;');
+
+      const logoUrl = 'https://siladik-upi.vercel.app/assets/images/logo-upi-bulat.png';
+      const textHtml = kopText ? kopText.innerHTML : '';
+
+      table.innerHTML = `
+        <tr>
+          <td style="width: 85px; vertical-align: middle; text-align: center; border: none !important; padding: 0 10pt 6pt 0;">
+            <img src="${logoUrl}" width="80" height="80" style="width: 80px; height: 80px; display: block;" alt="Logo UPI" />
+          </td>
+          <td style="vertical-align: middle; text-align: center; border: none !important; padding: 0 0 6pt 0;">
+            ${textHtml}
+          </td>
+        </tr>
+      `;
+      kop.replaceWith(table);
+    });
+
+    // 2. Pastikan semua path gambar relatif berubah jadi absolut URL
+    clone.querySelectorAll('img').forEach(img => {
+      let src = img.getAttribute('src') || '';
+      if (src && !src.startsWith('http') && !src.startsWith('data:')) {
+        img.setAttribute('src', 'https://siladik-upi.vercel.app/' + src.replace(/^\//, ''));
+      }
+    });
+
+    // 3. Rapihkan Tabel Identitas Mahasiswa (Hapus semua garis tabel agar bersih tanpa border)
+    clone.querySelectorAll('.doc-identity-table').forEach(tbl => {
+      tbl.setAttribute('border', '0');
+      tbl.setAttribute('cellpadding', '2');
+      tbl.setAttribute('cellspacing', '0');
+      tbl.setAttribute('style', 'width: 100%; border-collapse: collapse; border: none !important; margin-bottom: 12pt;');
+      tbl.querySelectorAll('td, th').forEach(cell => {
+        cell.setAttribute('style', 'border: none !important; padding: 2.5pt 4pt; font-family: "Times New Roman", serif; font-size: 11pt; color: #000000; vertical-align: top;');
+      });
+    });
+
+    // 4. Rapihkan Tabel Akademik (KRS / KHS / Transkrip) dengan border tegas standar resmi naskah dinas
+    clone.querySelectorAll('.doc-academic-table, .official-table').forEach(tbl => {
+      tbl.setAttribute('border', '1');
+      tbl.setAttribute('cellpadding', '4');
+      tbl.setAttribute('cellspacing', '0');
+      tbl.setAttribute('style', 'width: 100%; border-collapse: collapse; border: 1px solid #000000; margin-bottom: 12pt;');
+      tbl.querySelectorAll('th').forEach(th => {
+        th.setAttribute('style', 'border: 1px solid #000000; padding: 4.5pt 6pt; background-color: #f1f5f9; font-weight: bold; font-family: "Times New Roman", serif; font-size: 11pt; text-align: center; color: #000000;');
+      });
+      tbl.querySelectorAll('td').forEach(td => {
+        const isCenter = td.classList.contains('text-center') || td.style.textAlign === 'center';
+        td.setAttribute('style', `border: 1px solid #000000; padding: 4pt 6pt; font-family: "Times New Roman", serif; font-size: 11pt; color: #000000; text-align: ${isCenter ? 'center' : 'left'};`);
+      });
+    });
+
+    // 5. Susun Ringkasan Nilai & Kotak TTD menjadi Tabel 2-Kolom Sejajar (Summary di kiri, TTD di kanan)
+    const summaryBox = clone.querySelector('.doc-summary-box');
+    const signBlock = clone.querySelector('.doc-sign-block') || clone.querySelector('.doc-signature-wrapper');
+
+    if (signBlock) {
+      const footerTable = document.createElement('table');
+      footerTable.setAttribute('border', '0');
+      footerTable.setAttribute('cellpadding', '0');
+      footerTable.setAttribute('cellspacing', '0');
+      footerTable.setAttribute('style', 'width: 100%; border-collapse: collapse; border: none !important; margin-top: 14pt;');
+
+      const leftColHtml = summaryBox ? `
+        <div style="font-family: 'Times New Roman', serif; font-size: 10.5pt; line-height: 1.5; border: 1px solid #94a3b8; padding: 6pt 10pt; background-color: #f8fafc; border-radius: 4px;">
+          ${summaryBox.innerHTML}
+        </div>
+      ` : '';
+
+      const signContentHtml = `
+        <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.35; text-align: left; padding-left: 15pt; color: #000000;">
+          ${signBlock.innerHTML}
+        </div>
+      `;
+
+      footerTable.innerHTML = `
+        <tr>
+          <td style="width: 52%; vertical-align: top; border: none !important; padding: 0 10pt 0 0;">
+            ${leftColHtml}
+          </td>
+          <td style="width: 48%; vertical-align: top; border: none !important; padding: 0 0 0 15pt;">
+            ${signContentHtml}
+          </td>
+        </tr>
+      `;
+
+      if (summaryBox) summaryBox.remove();
+      signBlock.replaceWith(footerTable);
+      const signWrap = clone.querySelector('.doc-signature-wrapper');
+      if (signWrap && signWrap !== signBlock) signWrap.remove();
+    }
+
+    const wordBodyHtml = clone.innerHTML;
+
+    const htmlDocument = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' 
             xmlns:w='urn:schemas-microsoft-com:office:word' 
             xmlns='http://www.w3.org/TR/REC-html40'>
       <head>
         <meta charset='utf-8'>
         <title>Draf Dokumen Resmi SILADIK UPI</title>
+        <!--[if gte mso 9]>
+        <xml>
+          <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+          </w:WordDocument>
+        </xml>
+        <![endif]-->
         <style>
-          body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.45; color: #000000; }
-          table { border-collapse: collapse; width: 100%; margin-bottom: 12pt; }
-          th, td { padding: 4pt 6pt; font-size: 11pt; }
-          .official-table th, .official-table td { border: 1px solid #000000; }
-          .kop-surat { text-align: center; border-bottom: 2px solid #000000; margin-bottom: 14pt; padding-bottom: 6pt; }
-          .doc-heading { text-align: center; font-weight: bold; font-size: 13pt; margin-bottom: 12pt; text-decoration: underline; }
-          .doc-paragraph { text-align: justify; text-indent: 28pt; margin-bottom: 8pt; }
-          .doc-identity-table td { padding: 2pt 4pt; }
-          .ttd-box { margin-top: 18pt; }
+          @page Section1 {
+            size: 21.0cm 29.7cm; /* Standar Kertas A4 */
+            margin: 2.0cm 2.0cm 2.0cm 2.5cm;
+            mso-header-margin: 1.0cm;
+            mso-footer-margin: 1.0cm;
+            mso-paper-source: 0;
+          }
+          div.Section1 { page: Section1; }
+          body {
+            font-family: 'Times New Roman', serif;
+            font-size: 11.5pt;
+            line-height: 1.38;
+            color: #000000;
+            background: #ffffff;
+          }
+          p {
+            margin-top: 0;
+            margin-bottom: 8pt;
+            text-align: justify;
+            line-height: 1.4;
+          }
+          .doc-heading {
+            text-align: center;
+            margin-bottom: 12pt;
+          }
+          .doc-main-title {
+            font-family: 'Times New Roman', serif;
+            font-size: 13pt;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 2pt;
+          }
+          .doc-number {
+            font-family: 'Times New Roman', serif;
+            font-size: 10.5pt;
+          }
+          .sign-visual-container {
+            height: 50pt;
+          }
+          .sign-date, .sign-role, .sign-name, .sign-nip {
+            font-family: 'Times New Roman', serif;
+            font-size: 11pt;
+          }
+          .official-doc-page {
+            background: #ffffff !important;
+            color: #000000 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+          }
+          .doc-page-body {
+            padding: 0 !important;
+          }
         </style>
       </head>
       <body>
+        <div class="Section1">
+          ${wordBodyHtml}
+        </div>
+      </body>
+      </html>
     `;
-    const footer = "</body></html>";
-    const sourceHtml = header + previewContainer.innerHTML + footer;
-    const blob = new Blob(['\ufeff', sourceHtml], { type: 'application/msword' });
+
+    const blob = new Blob(['\ufeff', htmlDocument], { type: 'application/msword' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -746,7 +908,7 @@ const StaffView = (() => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    App.showToast('Draf dokumen format Microsoft Word (.doc) berhasil diunduh!', 'success');
+    App.showToast('Draf dokumen format Microsoft Word (.doc) berhasil diunduh dengan logo & tata letak rapi!', 'success');
   }
 
   function handleScanUpload(event, reqId) {
