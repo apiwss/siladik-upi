@@ -767,60 +767,61 @@ const StaffView = (() => {
       tbl.setAttribute('border', '1');
       tbl.setAttribute('cellpadding', '4');
       tbl.setAttribute('cellspacing', '0');
-      tbl.setAttribute('style', 'width: 100%; border-collapse: collapse; border: 1px solid #000000; margin-bottom: 12pt;');
+      tbl.setAttribute('style', 'width: 100%; border-collapse: collapse; border: 1.5pt solid #000000; margin-bottom: 0;');
       tbl.querySelectorAll('th').forEach(th => {
-        th.setAttribute('style', 'border: 1px solid #000000; padding: 4.5pt 6pt; background-color: #f1f5f9; font-weight: bold; font-family: "Times New Roman", serif; font-size: 11pt; text-align: center; color: #000000;');
+        th.setAttribute('style', 'border: 1px solid #000000; padding: 4.5pt 6pt; background-color: #f1f5f9; font-weight: bold; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; text-align: center; color: #000000;');
       });
       tbl.querySelectorAll('td').forEach(td => {
         const isCenter = td.classList.contains('text-center') || td.style.textAlign === 'center';
-        td.setAttribute('style', `border: 1px solid #000000; padding: 4pt 6pt; font-family: "Times New Roman", serif; font-size: 11pt; color: #000000; text-align: ${isCenter ? 'center' : 'left'};`);
+        td.setAttribute('style', `border: 1px solid #000000; padding: 4pt 6pt; font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000000; text-align: ${isCenter ? 'center' : 'left'};`);
       });
     });
 
-    // 5. Pastikan ruang tanda tangan memiliki jarak tinggi cukup dan tidak collapse di Word
-    clone.querySelectorAll('.sign-visual-container').forEach(el => {
-      el.innerHTML = '<div style="height: 45pt; line-height: 45pt;">&nbsp;</div>';
+    // 5. Transform doc-summary-box menjadi Tabel Bingkai Horizontal Penuh (Persis seperti di PDF!)
+    clone.querySelectorAll('.doc-summary-box').forEach(box => {
+      const items = Array.from(box.children);
+      const summaryTable = document.createElement('table');
+      summaryTable.setAttribute('border', '1');
+      summaryTable.setAttribute('cellpadding', '6');
+      summaryTable.setAttribute('cellspacing', '0');
+      summaryTable.setAttribute('style', 'width: 100%; border-collapse: collapse; border: 1.5pt solid #000000; border-top: none; background-color: #ffffff; margin-top: 0; margin-bottom: 22pt;');
+
+      if (items.length > 0) {
+        const tdList = items.map((item, idx) => {
+          const align = idx === 0 ? 'left' : (idx === items.length - 1 ? 'right' : 'center');
+          return `<td style="border: none !important; padding: 6pt 8pt; font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; text-align: ${align}; vertical-align: middle;">${item.innerHTML}</td>`;
+        }).join('');
+        summaryTable.innerHTML = `<tr>${tdList}</tr>`;
+      } else {
+        summaryTable.innerHTML = `<tr><td style="border: none !important; padding: 6pt 10pt; font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt;">${box.innerHTML}</td></tr>`;
+      }
+      box.replaceWith(summaryTable);
     });
 
-    // 6. Susun Ringkasan Nilai & Kotak TTD menjadi Tabel 2-Kolom Sejajar (Summary di kiri, TTD di kanan)
-    const summaryBox = clone.querySelector('.doc-summary-box');
+    // 6. Pastikan ruang tanda tangan memiliki jarak tinggi cukup dan tidak collapse di Word
+    clone.querySelectorAll('.sign-visual-container').forEach(el => {
+      el.innerHTML = '<div style="height: 48pt; line-height: 48pt;">&nbsp;</div>';
+    });
+
+    // 7. Susun Kotak TTD Pimpinan Rapi di Sebelah Kanan Bawah (Persis seperti di PDF!)
     const signWrap = clone.querySelector('.doc-signature-wrapper') || clone.querySelector('.doc-sign-block');
-
     if (signWrap) {
-      const footerTable = document.createElement('table');
-      footerTable.setAttribute('border', '0');
-      footerTable.setAttribute('cellpadding', '0');
-      footerTable.setAttribute('cellspacing', '0');
-      footerTable.setAttribute('style', 'width: 100%; border-collapse: collapse; border: none !important; margin-top: 14pt;');
-
-      const leftColHtml = summaryBox ? `
-        <div style="font-family: 'Times New Roman', serif; font-size: 10.5pt; line-height: 1.5; border: 1px solid #94a3b8; padding: 6pt 10pt; background-color: #f8fafc; border-radius: 4px;">
-          ${summaryBox.innerHTML}
-        </div>
-      ` : '';
-
       const signContent = clone.querySelector('.doc-sign-block') || signWrap;
-      const signContentHtml = `
-        <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.35; text-align: left; padding-left: 15pt; color: #000000;">
-          ${signContent.innerHTML}
-        </div>
-      `;
+      const signTable = document.createElement('table');
+      signTable.setAttribute('border', '0');
+      signTable.setAttribute('cellpadding', '0');
+      signTable.setAttribute('cellspacing', '0');
+      signTable.setAttribute('style', 'width: 100%; border-collapse: collapse; border: none !important; margin-top: 20pt;');
 
-      footerTable.innerHTML = `
+      signTable.innerHTML = `
         <tr>
-          <td style="width: 52%; vertical-align: top; border: none !important; padding: 0 10pt 0 0;">
-            ${leftColHtml}
-          </td>
-          <td style="width: 48%; vertical-align: top; border: none !important; padding: 0 0 0 15pt;">
-            ${signContentHtml}
+          <td style="width: 52%; border: none !important;"></td>
+          <td style="width: 48%; vertical-align: top; border: none !important; text-align: left; padding-left: 10pt; font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.35; color: #000000;">
+            ${signContent.innerHTML}
           </td>
         </tr>
       `;
-
-      if (summaryBox) {
-        summaryBox.remove();
-      }
-      signWrap.replaceWith(footerTable);
+      signWrap.replaceWith(signTable);
     }
 
     const wordBodyHtml = clone.innerHTML;
