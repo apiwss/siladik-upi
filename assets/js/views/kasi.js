@@ -120,7 +120,7 @@ const KasiView = (() => {
         </div>
         <div class="card-body">
           <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-color); margin-bottom: 1rem;">
-            Berdasarkan analisis real-time pada <strong>${analytics.total} total pengajuan</strong>, performa layanan akademik saat ini menunjukkan <strong>tingkat efisiensi yang sangat baik (SLA Compliance: ${analytics.slaComplianceRate})</strong>. Rata-rata waktu penyelesaian keseluruhan berada pada <strong>${analytics.avgResolutionMinutes} menit</strong>, secara drastis memangkas waktu dari alur manual yang biasanya memakan waktu hingga berhari-hari.
+            Berdasarkan analisis real-time pada <strong>${analytics.total} total pengajuan</strong>, performa layanan akademik saat ini menunjukkan <strong>tingkat efisiensi yang sangat baik (SLA Compliance: ${analytics.slaComplianceRate})</strong>. Rata-rata waktu penyelesaian keseluruhan berada pada <strong>${analytics.avgResolutionMinutes} menit</strong>, membuktikan efektivitas pemrosesan dokumen akademik sesuai standar mutu pelayanan.
           </p>
           <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1.5rem; margin-bottom: 1rem;">
             <li><strong>Beban Kerja Eksekutor:</strong> Terdistribusi dengan merata antar staf Tata Usaha Akademik.</li>

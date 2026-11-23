@@ -43,15 +43,15 @@ const StaffView = (() => {
           Staf Tata Usaha Layanan Akademik
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; position: relative; z-index: 1;">
-          <div>
+          <div style="flex: 1 1 280px; min-width: 0;">
             <h2 style="font-size: 1.35rem; color: #ffffff; font-weight: 700; margin-bottom: 0.25rem;">${user.nama}</h2>
-            <p style="font-size: 0.85rem; color: #cbd5e1;">
+            <p style="font-size: 0.85rem; color: #cbd5e1; margin: 0;">
               Unit Layanan Verifikasi Berkas Fisik & Cetak Surat • S1 Bisnis Digital UPI Tasikmalaya
             </p>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); padding: 0.5rem 0.9rem; border-radius: var(--radius-md); font-size: 0.8rem; color: #f8fafc; display: flex; align-items: center; gap: 0.5rem;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div style="flex-shrink: 0; white-space: nowrap;">
+            <div style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); padding: 0.5rem 1rem; border-radius: 10px; font-size: 0.82rem; color: #ffffff; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <span>Standar SLA: <strong>Maks. 3 Hari Kerja</strong></span>
             </div>
           </div>
@@ -79,7 +79,7 @@ const StaffView = (() => {
             </div>
           </div>
           <div class="stat-value">${allRequests.filter(r => r.status === 'verifikasi_staf').length}</div>
-          <div class="stat-meta positive">Penyusunan otomatis pangkalan data akademik</div>
+          <div class="stat-meta positive">Penyusunan draf resmi dokumen akademik</div>
         </div>
 
         <div class="stat-card">
@@ -90,7 +90,7 @@ const StaffView = (() => {
             </div>
           </div>
           <div class="stat-value">${completedToday.length}</div>
-          <div class="stat-meta positive">Telah melalui verifikasi & pengesahan resmi</div>
+          <div class="stat-meta positive">Pengesahan tanda tangan basah & cap resmi</div>
         </div>
 
         <div class="stat-card">
@@ -101,7 +101,7 @@ const StaffView = (() => {
             </div>
           </div>
           <div class="stat-value">1.8 Menit</div>
-          <div class="stat-meta positive">Memangkas proses manual Word (3 hari)</div>
+          <div class="stat-meta positive">Standar efisiensi layanan pangkalan data SILADIK</div>
         </div>
       </div>
 
