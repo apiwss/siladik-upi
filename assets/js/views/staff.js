@@ -777,11 +777,16 @@ const StaffView = (() => {
       });
     });
 
-    // 5. Susun Ringkasan Nilai & Kotak TTD menjadi Tabel 2-Kolom Sejajar (Summary di kiri, TTD di kanan)
-    const summaryBox = clone.querySelector('.doc-summary-box');
-    const signBlock = clone.querySelector('.doc-sign-block') || clone.querySelector('.doc-signature-wrapper');
+    // 5. Pastikan ruang tanda tangan memiliki jarak tinggi cukup dan tidak collapse di Word
+    clone.querySelectorAll('.sign-visual-container').forEach(el => {
+      el.innerHTML = '<div style="height: 45pt; line-height: 45pt;">&nbsp;</div>';
+    });
 
-    if (signBlock) {
+    // 6. Susun Ringkasan Nilai & Kotak TTD menjadi Tabel 2-Kolom Sejajar (Summary di kiri, TTD di kanan)
+    const summaryBox = clone.querySelector('.doc-summary-box');
+    const signWrap = clone.querySelector('.doc-signature-wrapper') || clone.querySelector('.doc-sign-block');
+
+    if (signWrap) {
       const footerTable = document.createElement('table');
       footerTable.setAttribute('border', '0');
       footerTable.setAttribute('cellpadding', '0');
@@ -794,9 +799,10 @@ const StaffView = (() => {
         </div>
       ` : '';
 
+      const signContent = clone.querySelector('.doc-sign-block') || signWrap;
       const signContentHtml = `
         <div style="font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.35; text-align: left; padding-left: 15pt; color: #000000;">
-          ${signBlock.innerHTML}
+          ${signContent.innerHTML}
         </div>
       `;
 
@@ -811,10 +817,10 @@ const StaffView = (() => {
         </tr>
       `;
 
-      if (summaryBox) summaryBox.remove();
-      signBlock.replaceWith(footerTable);
-      const signWrap = clone.querySelector('.doc-signature-wrapper');
-      if (signWrap && signWrap !== signBlock) signWrap.remove();
+      if (summaryBox) {
+        summaryBox.remove();
+      }
+      signWrap.replaceWith(footerTable);
     }
 
     const wordBodyHtml = clone.innerHTML;
